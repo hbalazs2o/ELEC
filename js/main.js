@@ -1,13 +1,13 @@
 /**
- * Irodai Asszisztens - Global Core Logic (V3.60 - Optimized)
+ * ELEC Dashboard - Global Core Logic (V4.0 SANITIZED)
  */
 
 const App = {
     state: {
         user: null,
-        theme: localStorage.getItem('theme') || 'light',
+        theme: localStorage.getItem('theme') || 'dark',
         location: { lat: 46.229, lon: 17.365 },
-        version: 'V3.60',
+        version: 'V4.0',
         powerAlert: false
     },
 
@@ -222,13 +222,13 @@ const App = {
         const norm = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         input.addEventListener('input', e => {
             const q = norm(e.target.value);
-            document.querySelectorAll('.feature-card').forEach(card => {
+            document.querySelectorAll('.compact-tile').forEach(card => {
                 const t = norm(card.querySelector('h5')?.innerText ?? '');
                 const match = q === '' || t.includes(q);
                 card.style.display = match ? 'flex' : 'none';
             });
-            document.querySelectorAll('.category-group').forEach(group => {
-                const visible = [...group.querySelectorAll('.feature-card')].some(c => c.style.display !== 'none');
+            document.querySelectorAll('.category-column').forEach(group => {
+                const visible = [...group.querySelectorAll('.compact-tile')].some(c => c.style.display !== 'none');
                 group.style.display = visible ? '' : 'none';
             });
         });

@@ -4,18 +4,14 @@
 
 const UI = {
     config: {
-        logoText: "IRODAI<br>ASSZISZTENS",
-        version: "V3.60"
+        logoText: "ELEC<br>DASHBOARD",
+        version: "V4.0 SANITIZED"
     },
 
     getBasePath() {
-        // Calculate relative path to root based on current depth
         const path = window.location.pathname;
-        const depth = (path.match(/\//g) || []).length;
-        // This is a bit tricky for local files. 
-        // Let's assume a standard structure where index.html is in the root.
         if (path.includes('/modules/') || path.includes('/tools/') || path.includes('/blocks/')) {
-            if (path.includes('/lean/')) return '../../';
+            if (path.includes('/lean/') || path.includes('/process/')) return '../../';
             return '../';
         }
         return './';
@@ -34,11 +30,10 @@ const UI = {
                 <a href="${base}index.html#modulok" class="nav-link">MODULOK</a>
                 <a href="${base}index.html#blokkok" class="nav-link">BLOKKOK</a>
                 <a href="${base}index.html#eszközök" class="nav-link">ESZKÖZÖK</a>
+                <a href="${base}index.html#process" class="nav-link">PROCESS</a>
             </nav>
 
             <div class="header-info-line">
-                <div class="h-info-item"><i class="fas fa-sun"></i> <span class="h-info-val h-info-item-sun">--:-- | --:--</span></div>
-                <div class="h-info-item"><i class="fas fa-thermometer-half"></i> <span class="h-info-val" id="header-temp-val">--°C</span></div>
                 <div class="h-info-item"><i class="fas fa-clock"></i> <span class="h-info-val" id="global-clock-time">00:00:00</span></div>
                 <div class="h-info-item"><i class="fas fa-calendar-alt"></i> <span class="h-info-val" id="global-clock-date">----. --. --.</span></div>
                 <div class="h-info-item"><i class="fas fa-map-marker-alt"></i> <span class="h-info-val">Nagyatád</span></div>
@@ -62,7 +57,7 @@ const UI = {
         const footerHTML = `
         <footer class="app-footer">
             <div class="footer-content">
-                © 2024-2026 Irodai Asszisztens | ${this.config.version} | Minden jog fenntartva.
+                © 2026 ELEC INDUSTRIAL | ${this.config.version} | CONFIDENTIAL
             </div>
         </footer>
         `;
@@ -80,7 +75,6 @@ const UI = {
     }
 };
 
-// Auto-init when script is loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => UI.init());
 } else {

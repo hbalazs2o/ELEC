@@ -1,405 +1,140 @@
 <!DOCTYPE html>
-<html lang="hu" data-theme="light">
+<html lang="hu" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fordító - Irodai Asszisztens</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&family=Inter:wght@400;600&display=swap"
-        rel="stylesheet">
+    <title>Intelligens Fordító - ELEC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../css/main.css">
     <style>
-        .translator-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            background: var(--bg-card);
-            padding: 3rem;
-            border-radius: 2.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .translator-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(67, 238, 124, 0.05) 0%, transparent 70%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .translator-content {
-            position: relative;
-            z-index: 1;
+        .translator-layout {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
         .lang-grid {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .lang-select-wrapper {
-            position: relative;
-            display: flex;
+            gap: 1rem;
             align-items: center;
         }
 
         .lang-select {
             width: 100%;
-            padding: 1.2rem;
-            padding-left: 3rem;
-            border-radius: 1.25rem;
-            border: 2px solid var(--border-color);
-            background: var(--bg-light);
+            padding: 0.5rem;
+            background: var(--bg-card);
             color: var(--text-main);
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.3s;
-            appearance: none;
-            font-size: 1rem;
-        }
-
-        .lang-select:focus {
-            border-color: var(--primary-light);
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
-            outline: none;
-        }
-
-        .lang-icon {
-            position: absolute;
-            left: 1.2rem;
-            font-size: 1.2rem;
-            pointer-events: none;
-        }
-
-        .swap-btn {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            border: none;
-            background: var(--primary-light);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-        }
-
-        .swap-btn:hover {
-            transform: rotate(180deg) scale(1.1);
-            background: var(--primary);
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
         }
 
         .text-areas {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
-        .text-box-label {
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .transcript-area {
+        .transcript-area, .output-area {
             width: 100%;
-            background: var(--bg-light);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            min-height: 150px;
-            border: 2px solid var(--border-color);
-            font-size: 1.15rem;
-            line-height: 1.6;
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            resize: vertical;
-            transition: all 0.3s;
-        }
-
-        .transcript-area:focus {
-            border-color: var(--primary-light);
+            min-height: 200px;
+            padding: 1rem;
             background: var(--bg-card);
-            outline: none;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
         }
 
         .output-area {
-            background: var(--bg-light);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            min-height: 150px;
-            border: 2px solid var(--border-color);
+            background: transparent;
             border-style: dashed;
-            font-size: 1.15rem;
-            line-height: 1.6;
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            opacity: 0.9;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .output-area.active {
-            border-style: solid;
-            background: rgba(67, 238, 124, 0.03);
-            border-color: var(--primary-light);
-            opacity: 1;
         }
 
         .controls {
             display: flex;
-            gap: 1.2rem;
+            gap: 1rem;
             justify-content: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .btn-action {
-            padding: 1.1rem 2.5rem;
-            border-radius: 1.5rem;
-            border: none;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            transition: all 0.3s;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-record {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn-record:hover {
-            background: #d32f2f;
-            transform: translateY(-2px);
-        }
-
-        .btn-record.recording {
-            animation: pulse-red 1.5s infinite;
-        }
-
-        .btn-play {
-            background: var(--primary-light);
-            color: white;
-        }
-
-        .btn-play:hover:not(:disabled) {
-            background: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .btn-play:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        @keyframes pulse-red {
-            0% {
-                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 20px rgba(244, 67, 54, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
-            }
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 1.2rem;
-            border-radius: 2rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-            background: var(--bg-light);
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .status-listening {
-            background: #ffebee;
-            color: #d32f2f;
-            border-color: #ffcdd2;
-        }
-
-        .status-translating {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-color: #c8e6c9;
         }
     </style>
 </head>
 
-<body>
-    <header class="app-header">
-        <a href="../../index.html" class="logo"><i class="fab fa-android"></i><span>Irodai<br>Asszisztens</span></a>
-        <div class="header-info">
-            <div id="header-weather"></div>
-            <div id="global-clock"></div><button onclick="App.toggleTheme()"
-                style="background:none; border:none; font-size:1.4rem; color:var(--text-main); cursor:pointer;"><i
-                    id="theme-toggle-icon" class="fas fa-moon"></i></button>
-        </div>
-    </header>
+<body class="module-body">
+    <!-- Unified Header injected by header.js -->
 
-    <main class="container py-5 fade-in">
-        <div class="translator-container">
-            <div class="translator-content">
-                <h2 class="mb-4"
-                    style="font-family:'Outfit'; font-weight:800; color:var(--primary); text-shadow: 0 0 20px rgba(67, 238, 124, 0.2);">
-                    <i class="fas fa-language me-2"></i> FORDÍTÓ SEGÉD
-                </h2>
+    <div class="module-container">
+        <div class="module-content-wrapper">
+            <h1>Intelligens Fordító</h1>
+            <p>Fordítson szövegeket több nyelvre valós időben.</p>
 
+            <div class="translator-layout">
                 <div class="lang-grid">
-                    <div class="lang-select-wrapper">
-                        <span id="src-flag" class="lang-icon">🇭🇺</span>
-                        <select id="src-lang" class="lang-select" onchange="updateIcons()">
-                            <option value="hu-HU">🇭🇺 Magyar</option>
-                            <option value="en-US">🇺🇸 Angol</option>
-                            <option value="de-DE">🇩🇪 Német</option>
-                            <option value="ru-RU">🇷🇺 Orosz</option>
-                            <option value="zh-CN">🇨🇳 Kínai</option>
-                        </select>
-                    </div>
-                    <button class="swap-btn" onclick="swapLangs()"><i class="fas fa-exchange-alt"></i></button>
-                    <div class="lang-select-wrapper">
-                        <span id="target-flag" class="lang-icon">🇺🇸</span>
-                        <select id="target-lang" class="lang-select" onchange="updateIcons(); translateText();">
-                            <option value="en-US">🇺🇸 Angol</option>
-                            <option value="hu-HU">🇭🇺 Magyar</option>
-                            <option value="de-DE">🇩🇪 Német</option>
-                            <option value="ru-RU">🇷🇺 Orosz</option>
-                            <option value="zh-CN">🇨🇳 Kínai</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="status" class="status-badge">
-                    <i class="fas fa-circle"></i> KÉSZ
+                    <select id="src-lang" class="lang-select">
+                        <option value="hu-HU">Magyar</option>
+                        <option value="en-US">Angol</option>
+                        <option value="de-DE">Német</option>
+                    </select>
+                    <button class="btn-text" onclick="swapLangs()"><i class="fas fa-exchange-alt"></i></button>
+                    <select id="target-lang" class="lang-select">
+                        <option value="en-US" selected>Angol</option>
+                        <option value="hu-HU">Magyar</option>
+                        <option value="de-DE">Német</option>
+                    </select>
                 </div>
 
                 <div class="text-areas">
-                    <div>
-                        <div class="text-box-label"><i class="fas fa-keyboard"></i> Forrás szöveg (szerkeszthető)</div>
-                        <textarea class="transcript-area" id="src-text"
-                            placeholder="Kattintson a mikrofonra és beszéljen, vagy gépeljen ide..."
-                            oninput="autoTranslate()"></textarea>
-                    </div>
-                    <div>
-                        <div class="text-box-label"><i class="fas fa-magic"></i> Intelligens fordítás</div>
-                        <div class="output-area" id="target-text">Fordítás helye...</div>
-                    </div>
+                    <textarea class="transcript-area" id="src-text" placeholder="Írja ide a forrás szöveget..." oninput="autoTranslate()"></textarea>
+                    <div class="output-area" id="target-text">A fordítás helye...</div>
                 </div>
 
                 <div class="controls">
-                    <button id="record-btn" class="btn-action btn-record" onclick="toggleRecording()">
-                        <i class="fas fa-microphone"></i> BESZÉLÉS
-                    </button>
-                    <button id="play-btn" class="btn-action btn-play" onclick="playTranslation()" disabled>
-                        <i class="fas fa-volume-up"></i> LEJÁTSZÁS
-                    </button>
-                </div>
-
-                <div class="hint"
-                    style="font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-                    <span><i class="fas fa-info-circle me-1"></i> Google Neural Translation Engine v2</span>
-                    <span style="opacity: 0.6;">v3.5.0 Premium</span>
+                    <button id="record-btn" class="btn-text" onclick="toggleRecording()"><i class="fas fa-microphone"></i> Beszéd</button>
+                    <button id="play-btn" class="btn-text" onclick="playTranslation()" disabled><i class="fas fa-volume-up"></i> Lejátszás</button>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <script src="../../js/main.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/main.js"></script>
     <script>
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         let isRecording = false;
         let lastTranslation = "";
         let translateTimeout;
-        let voices = [];
         const synth = window.speechSynthesis;
 
         recognition.interimResults = true;
-        recognition.lang = document.getElementById('src-lang').value;
-
-        // Initialize voices with robust handling for mobile
-        function populateVoices() {
-            voices = synth.getVoices();
-        }
-
-        populateVoices();
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = populateVoices;
-        }
-
-        // Mobile retry interval for voices
-        const voiceRetry = setInterval(() => {
-            populateVoices();
-            if (voices.length > 0) clearInterval(voiceRetry);
-        }, 1000);
 
         recognition.onstart = () => {
             isRecording = true;
-            document.getElementById('record-btn').classList.add('recording');
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle"></i> FIGYELÉS...';
-            document.getElementById('status').className = 'status-badge status-listening';
-            document.getElementById('src-text').value = '';
+            document.getElementById('record-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Figyelés...';
         };
 
         recognition.onend = () => {
             isRecording = false;
-            document.getElementById('record-btn').classList.remove('recording');
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle"></i> KÉSZ';
-            document.getElementById('status').className = 'status-badge';
+            document.getElementById('record-btn').innerHTML = '<i class="fas fa-microphone"></i> Beszéd';
             translateText();
         };
 
         recognition.onresult = (event) => {
-            let interim = '';
             let final = '';
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) final += event.results[i][0].transcript;
-                else interim += event.results[i][0].transcript;
             }
-            if (final || interim) {
-                document.getElementById('src-text').value = final || interim;
-            }
+            if (final) document.getElementById('src-text').value = final;
         };
 
         function toggleRecording() {
-            if (isRecording) {
-                recognition.stop();
-            } else {
+            if (isRecording) recognition.stop();
+            else {
                 recognition.lang = document.getElementById('src-lang').value;
                 recognition.start();
             }
@@ -413,16 +148,11 @@
         async function translateText() {
             const text = document.getElementById('src-text').value.trim();
             const targetDisplay = document.getElementById('target-text');
-
             if (!text) {
-                targetDisplay.innerText = "Fordítás helye...";
-                targetDisplay.classList.remove('active');
+                targetDisplay.innerText = "A fordítás helye...";
                 document.getElementById('play-btn').disabled = true;
                 return;
             }
-
-            document.getElementById('status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> FORDÍTÁS...';
-            document.getElementById('status').className = 'status-badge status-translating';
 
             const sl = document.getElementById('src-lang').value.split('-')[0];
             const tl = document.getElementById('target-lang').value.split('-')[0];
@@ -433,36 +163,18 @@
                 const data = await res.json();
                 lastTranslation = data[0].map(x => x[0]).join('');
                 targetDisplay.innerText = lastTranslation;
-                targetDisplay.classList.add('active');
                 document.getElementById('play-btn').disabled = false;
             } catch (e) {
-                console.error("Translation error", e);
-                targetDisplay.innerText = "Hiba a fordítás során. Ellenőrizze a kapcsolatot.";
-                targetDisplay.classList.remove('active');
-            } finally {
-                document.getElementById('status').innerHTML = '<i class="fas fa-circle"></i> KÉSZ';
-                document.getElementById('status').className = 'status-badge';
+                targetDisplay.innerText = "Hiba történt a fordítás során.";
             }
         }
 
         function playTranslation() {
             if (!lastTranslation) return;
-
-            // Critical for mobile: cancel any existing speech
             synth.cancel();
-
             const utterThis = new SpeechSynthesisUtterance(lastTranslation);
-            const targetLang = document.getElementById('target-lang').value;
-            utterThis.lang = targetLang;
-
-            // Find best matching voice for the target language
-            const voice = voices.find(v => v.lang === targetLang || v.lang.startsWith(targetLang.split('-')[0]));
-            if (voice) utterThis.voice = voice;
-
-            // Small delay helps stability on mobile browsers
-            setTimeout(() => {
-                synth.speak(utterThis);
-            }, 50);
+            utterThis.lang = document.getElementById('target-lang').value;
+            synth.speak(utterThis);
         }
 
         function swapLangs() {
@@ -471,26 +183,8 @@
             const tmp = src.value;
             src.value = target.value;
             target.value = tmp;
-
-            const srcText = document.getElementById('src-text');
-            const targetText = document.getElementById('target-text');
-            if (targetText.classList.contains('active')) {
-                srcText.value = targetText.innerText;
-            }
-
-            updateIcons();
             translateText();
         }
-
-        function updateIcons() {
-            const src = document.getElementById('src-lang');
-            const target = document.getElementById('target-lang');
-            document.getElementById('src-flag').innerText = src.options[src.selectedIndex].text.split(' ')[0];
-            document.getElementById('target-flag').innerText = target.options[target.selectedIndex].text.split(' ')[0];
-        }
-
-        // Initial icon sync
-        window.onload = updateIcons;
     </script>
 </body>
 

@@ -1,87 +1,37 @@
 <!DOCTYPE html>
-<html lang="hu" data-theme="light">
+<html lang="hu" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Időjárás - Irodai Asszisztens</title>
+    <title>Időjárás - ELEC</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/main.css">
-    <style>
-        .weather-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .w-stat-card { background: var(--bg-hover); padding: 1.5rem; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
-        .w-stat-val { font-family: var(--font-title); font-size: 1.5rem; font-weight: 800; color: var(--accent); margin: 0.5rem 0; }
-        .w-stat-label { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
-        .graph-container { margin-top: 2rem; }
-        .graph-card { background: var(--bg-hover); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; }
-        .graph-title { font-size: 0.8rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .graph-img { width: 100%; border-radius: 4px; border: 1px solid var(--border); }
-    </style>
 </head>
 
 <body class="module-body">
     <!-- Unified Header injected by header.js -->
+
     <div class="module-container">
-        <header class="module-header">
-            <div class="module-title">
-                <i class="fas fa-cloud-sun"></i>
-                <span>Helyi Időjárás</span>
-            </div>
-            <a href="../index.html" class="module-back">
-                <i class="fas fa-arrow-left"></i>
-                Vissza a főoldalra
-            </a>
-        </header>
-
-        <div class="module-content">
-            <div class="weather-grid">
-                <div class="w-stat-card">
-                    <i class="fas fa-thermometer-half" style="color:#f44336;"></i>
-                    <div id="weather-temp" class="w-stat-val">--°C</div>
-                    <div class="w-stat-label">Hőmérséklet</div>
-                </div>
-                <div class="w-stat-card">
-                    <i class="fas fa-wind" style="color:#2196f3;"></i>
-                    <div id="weather-wind" class="w-stat-val">-- km/h</div>
-                    <div class="w-stat-label">Szélsebesség</div>
-                </div>
-                <div class="w-stat-card">
-                    <i class="fas fa-tint" style="color:#03a9f4;"></i>
-                    <div id="weather-humid" class="w-stat-val">--%</div>
-                    <div class="w-stat-label">Páratartalom</div>
-                </div>
-                <div class="w-stat-card">
-                    <i class="fas fa-compress-arrows-alt" style="color:#4caf50;"></i>
-                    <div id="weather-press" class="w-stat-val">-- hPa</div>
-                    <div class="w-stat-label">Légnyomás</div>
-                </div>
+        <div class="module-content-wrapper">
+            <h1>Helyi Időjárás (Nagyatád)</h1>
+            
+            <div style="margin: 2rem 0;">
+                <p><strong>Hőmérséklet:</strong> <span id="weather-temp">--°C</span></p>
+                <p><strong>Szélsebesség:</strong> <span id="weather-wind">-- km/h</span></p>
+                <p><strong>Páratartalom:</strong> <span id="weather-humid">--%</span></p>
+                <p><strong>Légnyomás:</strong> <span id="weather-press">-- hPa</span></p>
             </div>
 
-            <div class="graph-container">
-                <div class="graph-card">
-                    <div class="graph-title"><i class="fas fa-chart-line"></i> Hőmérsékleti trend (Nagyatád)</div>
-                    <img src="https://www.idokep.hu/automata/omme_nagyatad_hom.png" class="graph-img" alt="Hőmérséklet">
-                </div>
-                <div class="graph-card">
-                    <div class="graph-title"><i class="fas fa-droplet"></i> Csapadék trend (Nagyatád)</div>
-                    <img id="precip-graph" src="https://www.idokep.hu/automata/omme_nagyatad_csap.png" class="graph-img" alt="Csapadék">
-                </div>
-            </div>
+            <p>Az adatok automatikusan frissülnek a központi rendszerből.</p>
         </div>
     </div>
 
     <script src="../js/header.js"></script>
     <script src="../js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const csapImg = document.getElementById('precip-graph');
-            if (csapImg) {
-                csapImg.src = `https://www.idokep.hu/automata/omme_nagyatad_csap1.png?t=${Date.now()}`;
-            }
-        });
-    </script>
 </body>
+
 </html>

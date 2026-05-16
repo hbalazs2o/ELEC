@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Virtuális Bejárás - ELEC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        
+        #ui {
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.8);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 1000;
+            cursor: pointer;
+            transition: opacity 0.5s;
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        canvas { display: block; }
+    </style>
+</head>
+
+<body class="module-body">
+    <!-- Unified Header injected by header.js -->
+
+    <div id="overlay">
+        <h1 style="font-family: 'Outfit'; font-weight: 800; font-size: 3rem;">3D TOUR</h1>
+        <p>Kattintson a belépéshez</p>
+        <div style="margin-top: 2rem; opacity: 0.6; font-size: 0.8rem; text-align: center;">
+            WASD: Mozgás | EGÉR: Nézelődés | SHIFT: Futás | ESC: Kilépés
+        </div>
+    </div>
+
+    <div id="ui">
+        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6;">Távolság</div>
+        <div style="font-size: 1.5rem; font-weight: 800;"><span id="distance">0.0</span> m</div>
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 1rem 0;">
+        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6;">Helyszín</div>
+        <div id="location" style="font-weight: 600;">Bejárat</div>
+    </div>
+
+    <div id="crosshair"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x080c14);
+        scene.fog = new THREE.Fog(0x080c14, 20, 150);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new PointerLockControls(camera, document.body);
+        const overlay = document.getElementById('overlay');
+        
+        overlay.addEventListener('click', () => controls.lock());
+        controls.addEventListener('lock', () => {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+        });
+        controls.addEventListener('unlock', () => {
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        });
+
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false, isRunning = false;
+        let velocity = new THREE.Vector3(), direction = new THREE.Vector3(), totalDistance = 0, prevPosition = new THREE.Vector3();
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case 'KeyW': moveForward = true; break;
+                case 'KeyA': moveLeft = true; break;
+                case 'KeyS': moveBackward = true; break;
+                case 'KeyD': moveRight = true; break;
+                case 'ShiftLeft': isRunning = true; break;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case 'KeyW': moveForward = false; break;
+                case 'KeyA': moveLeft = false; break;
+                case 'KeyS': moveBackward = false; break;
+                case 'KeyD': moveRight = false; break;
+                case 'ShiftLeft': isRunning = false; break;
+            }
+        });
+
+        // World
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
+        const wallMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.9 });
+        const accentMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6 });
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        sun.position.set(50, 100, 50);
+        scene.add(sun);
+
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // Simple boxes as placeholders for factory elements
+        for(let i=0; i<10; i++) {
+            const box = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 6), wallMat);
+            box.position.set(Math.random()*100-50, 1.5, Math.random()*100-50);
+            scene.add(box);
+        }
+
+        camera.position.set(0, 2, 20);
+        prevPosition.copy(camera.position);
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls.isLocked) {
+                const delta = clock.getDelta();
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+
+                const speed = isRunning ? 400.0 : 200.0;
+                if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
+
+                controls.moveRight(-velocity.x * delta);
+                controls.moveForward(-velocity.z * delta);
+
+                const dist = camera.position.distanceTo(prevPosition);
+                if(dist > 0.01) {
+                    totalDistance += dist;
+                    document.getElementById('distance').innerText = (totalDistance / 2.5).toFixed(1);
+                    prevPosition.copy(camera.position);
+                }
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+    <script src="../../js/header.js"></script>
+    <script src="../../js/main.js"></script>
+</body>
+
+</html>
