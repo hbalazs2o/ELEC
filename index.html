@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vezérlőpult - Irodai Asszisztens</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'><path fill='%233b82f6' d='M420.55,301.93a24,24,0,1,1,24-24,24,24,0,0,1-24,24m-265.1,0a24,24,0,1,1,24-24,24,24,0,0,1-24,24m273.7,70.59a12,12,0,0,1,0,24H147.15a12,12,0,0,1,0-24ZM532,224H480V128a128,128,0,0,0-256,0v96H172a52,52,0,0,0-52,52V460a52,52,0,0,0,52,52H404a52,52,0,0,0,52-52V276a52,52,0,0,0-52-52ZM272,128a80,80,0,0,1,160,0v32H272Zm132,332H172a20,20,0,0,1-20-20V276a20,20,0,0,1,20-20H404a20,20,0,0,1,20,20V440a20,20,0,0,1-20,20M96,192V112a16,16,0,0,0-32,0v80a16,16,0,0,0,32,0m448,0V112a16,16,0,0,0-32,0v80a16,16,0,0,0,32,0'/></svg>">
+    
+    <style>
+        #app-main, #auth-overlay { display: none; }
+        body.authenticated #app-main { display: block; }
+        body:not(.authenticated) #auth-overlay { display: flex; }
+    </style>
+</head>
+
+<body>
+
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-logo"><i class="fas fa-shield-halved"></i></div>
+            <h2 class="auth-title">Asszisztens</h2>
+            <p class="auth-subtitle">Kérjük, adja meg a belépési kódot</p>
+            <div class="auth-input-wrapper">
+                <input type="password" id="auth-password-input" class="auth-input" maxlength="4" placeholder="••••" autofocus>
+            </div>
+            <button onclick="App.login()" class="auth-btn">
+                <span>Belépés</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <div class="auth-footer">Irodai Asszisztens • V3.60</div>
+        </div>
+    </div>
+
+    <div id="app-main">
+        <!-- Unified Header injected by js/header.js -->
+
+        <div class="container">
+            <main class="dashboard-content fade-in">
+                
+                <div class="dashboard-toolbar">
+                    <div class="toolbar-left">
+                        <h2 class="section-title" style="font-size:0.85rem; font-family:var(--font-title); font-weight:800; color:var(--text-muted);">
+                            <i class="fas fa-layer-group"></i> VEZÉRLŐPULT
+                        </h2>
+                    </div>
+                    <div class="toolbar-center">
+                        <div class="toolbar-search-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="dashboard-search" placeholder="Gyorskereső a funkciók között...">
+                        </div>
+                    </div>
+                    <div class="toolbar-right">
+                        <div class="compact-monitoring">
+                            <div class="m-item"><span class="m-label">Energia</span><div class="m-val-line"><span class="gas"><i class="fas fa-fire"></i> 413 Ft</span><span class="elec"><i class="fas fa-bolt"></i> 96 Ft</span></div></div>
+                            <div class="m-item"><span class="m-label">Előrejelzés</span><div class="m-val-line"><span class="h-info-val"><i class="fas fa-cloud-sun" style="color:var(--accent)"></i> Ma: 11/22°</span></div></div>
+                            <div class="m-item"><span class="m-label">Átlag</span><strong class="m-val" style="color:var(--accent); font-size:0.85rem;" id="three-day-avg">15.6°C</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-bar">
+                    <a href="https://irattar.vercel.app/" target="_blank" class="btn-premium"><i class="fas fa-archive"></i> Irattár</a>
+                    <a href="https://adatb.vercel.app/" target="_blank" class="btn-premium"><i class="fas fa-database"></i> Adatbázis</a>
+                    <a href="modules/process_engineer_viewer.html" class="btn-spectacular"><i class="fas fa-graduation-cap"></i> Folyamatmérnöki felkészítő</a>
+                </div>
+
+                <div class="dashboard-sections-container">
+                    
+                    <!-- MODULOK -->
+                    <div class="category-column" id="modulok">
+                        <h3 class="group-title"><i class="fas fa-cubes"></i> MODULOK</h3>
+                        <div class="tiles-grid">
+                            <a href="modules/ai_atad_villany_black.html" class="feature-card">
+                                <i class="fas fa-robot"></i>
+                                <h5>AI Villany</h5>
+                            </a>
+                            <a href="modules/efficiency.html" class="feature-card">
+                                <i class="fas fa-rocket"></i>
+                                <h5>Hatékonyság</h5>
+                            </a>
+                            <a href="modules/relax_center.html" class="feature-card">
+                                <i class="fas fa-mug-hot"></i>
+                                <h5>Relax Center</h5>
+                            </a>
+                            <a href="modules/vibe_code.html" class="feature-card">
+                                <i class="fas fa-terminal"></i>
+                                <h5>Vájb Kód</h5>
+                            </a>
+                            <a href="modules/lean/index.html" class="feature-card">
+                                <i class="fas fa-keyboard"></i>
+                                <h5>Lean Alapok</h5>
+                            </a>
+                            <a href="modules/lean/lean_office.html" class="feature-card">
+                                <i class="fas fa-briefcase"></i>
+                                <h5>Lean Iroda</h5>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- BLOKKOK -->
+                    <div class="category-column" id="blokkok">
+                        <h3 class="group-title"><i class="fas fa-th-large"></i> BLOKKOK</h3>
+                        <div class="tiles-grid">
+                            <a href="blocks/template.html" class="feature-card">
+                                <i class="fas fa-plus-circle"></i>
+                                <h5>Új Blokk</h5>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ESZKÖZÖK -->
+                    <div class="category-column" id="eszközök">
+                        <h3 class="group-title"><i class="fas fa-tools"></i> ESZKÖZÖK</h3>
+                        <div class="tiles-grid">
+                            <a href="tools/local_weather.html" class="feature-card">
+                                <i class="fas fa-temperature-high"></i>
+                                <h5>Időjárás</h5>
+                            </a>
+                            <a href="tools/pdfreader.html" class="feature-card">
+                                <i class="fas fa-file-pdf"></i>
+                                <h5>PDF Olvasó</h5>
+                            </a>
+                            <a href="tools/speech.html" class="feature-card">
+                                <i class="fas fa-volume-up"></i>
+                                <h5>Felolvasó</h5>
+                            </a>
+                            <a href="tools/stt.html" class="feature-card">
+                                <i class="fas fa-microphone"></i>
+                                <h5>Beszéd írnok</h5>
+                            </a>
+                            <a href="tools/translator.html" class="feature-card">
+                                <i class="fas fa-language"></i>
+                                <h5>Fordító</h5>
+                            </a>
+                            <a href="tools/weather_log.html" class="feature-card">
+                                <i class="fas fa-cloud-sun"></i>
+                                <h5>Időjárás Napló</h5>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irodai Lean - Irodai Asszisztens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <style>
+        .lean-content {
+            background: var(--bg-card);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .lean-section {
+            margin-bottom: 3rem;
+        }
+
+        .lean-section h3 {
+            color: var(--primary);
+            font-family: 'Outfit';
+            font-weight: 800;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .lean-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .lean-card {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            border-left: 5px solid var(--primary);
+        }
+
+        .lean-card h4 {
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+        }
+
+        .lean-card p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header">
+        <a href="../../index.html" class="logo"><i class="fas fa-bolt" style="color:var(--accent);"></i><span>Irodai
+                Asszisztens</span></a>
+        <div class="header-info">
+            <div id="header-weather"></div>
+            <div id="global-clock"></div><button onclick="App.toggleTheme()"
+                style="background:none; border:none; font-size:1.4rem; color:var(--text-main); cursor:pointer;"><i
+                    id="theme-toggle-icon" class="fas fa-moon"></i></button>
+        </div>
+    </header>
+
+    <main class="container py-5 fade-in">
+        <div class="lean-content" style="max-width: 1100px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                <h2 style="font-family:'Outfit'; font-weight:800; margin:0;"><i
+                        class="fas fa-graduation-cap text-primary me-2"></i>Irodai Lean Tananyag</h2>
+            </div>
+
+            <div class="hint">
+                <i class="fas fa-quote-left me-2"></i>
+                <em style="display:block; margin-bottom: 0.5rem;">"A vevő volt és marad a legfontosabb személy ebben az
+                    irodában, akár személyesen, akár levélben jelentkezik. A vevő nem függ tőlünk, mi függünk tőle. A
+                    vevő nem zavaró tényezője a munkánknak, hanem éppenséggel annak célja és értelme. Nem teszünk neki
+                    szívességet, amikor kiszolgáljuk, ő tesz szívességet azzal, hogy nekünk lehetőséget nyújt
+                    erre."</em>
+                <strong>- L.L. Bean</strong>, Freeport, Maine állam.
+            </div>
+
+            <div class="lean-section">
+                <h3>1. Lean Történelem & Filozófia</h3>
+                <div class="lean-grid">
+                    <div class="lean-card" style="border-color: #3f51b5;">
+                        <h4>A gyökerek</h4>
+                        <p>A Lean alapjai a Toyota Production System-hez (TPS) nyúlnak vissza. Taiichi Ohno és Shigeo
+                            Shingo dolgozták ki az 1950-es években, célul tűzve ki a veszteségek (Muda) teljes
+                            kiiktatását.</p>
+                    </div>
+                    <div class="lean-card" style="border-color: #2196f3;">
+                        <h4>Alapelvek</h4>
+                        <p>1. Érték meghatározása, 2. Értékáram azonosítása, 3. Folyamatos áramlás, 4. Húzó rendszer
+                            (Pull), 5. Tökéletességre törekvés (Kaizen).</p>
+                    </div>
+                    <div class="lean-card" style="border-color: #7e57c2;">
+                        <h4>Irodai alkalmazás</h4>
+                        <p>Az irodai Lean nem a szalagmunka áthelyezése, hanem az információáramlás akadályainak
+                            elhárítása és a szellemi felesleg (pl. felesleges emailek) csökkentése.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lean-section">
+                <h3>2. TQM - Total Quality Management</h3>
+                <div class="hint" style="background:#e8f5e9; border-color:#4caf50; color:#1b5e20!important;">
+                    <i class="fas fa-shield-halved me-2"></i><strong>TQM Lényege:</strong> Olyan vezetési filozófia,
+                    ahol a minőségért a szervezet minden tagja felelős. Nem csak a végeredményt ellenőrizzük, hanem a
+                    teljes folyamatot a tervezéstől a vevői visszajelzésig.
+                </div>
+                <div class="lean-grid">
+                    <div class="lean-card" style="border-color: #4caf50;">
+                        <h4>Vevőközpontúság</h4>
+                        <p>A minőséget a vevő határozza meg. Minden belső folyamatnak a vevői igények kielégítését kell
+                            szolgálnia.</p>
+                    </div>
+                    <div class="lean-card" style="border-color: #2e7d32;">
+                        <h4>Tényeken alapuló döntés</h4>
+                        <p>Adatok és statisztikai módszerek használata a szubjektív megérzések helyett (Check-sheetek,
+                            kontroll diagramok).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lean-section">
+                <h3>3. Módszertanok & Veszteségek</h3>
+                <div class="lean-grid">
+                    <div class="lean-card" style="border-color: #5c6bc0;">
+                        <h4>DMAIC / PDCA</h4>
+                        <p>Strukturált problémamegoldási ciklusok. A Definiálás-Mérés-Elemzés-Javítás-Ellenőrzés
+                            sorrendje biztosítja a fenntartható eredményt.</p>
+                    </div>
+                    <div class="lean-card" style="border-color: #ef5350;">
+                        <h4>A 8 Fő Veszteség (DOWNTIME)</h4>
+                        <p>D-Defects (Hiba), O-Overproduction (Túltermelés), W-Waiting (Várakozás), N-Non-utilized
+                            talent (Kihasználatlan tudás), T-Transportation (Szállítás), I-Inventory (Készlet), M-Motion
+                            (Mozgás), E-Extra processing (Felesleges feldolgozás).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lean-section">
+                <h3>3. Részletes Módszertanok</h3>
+                <div class="lean-grid">
+                    <div class="lean-card" style="border-color: #ffa726;">
+                        <h4>PDCA (Deming-ciklus)</h4>
+                        <p><strong>Plan:</strong> Tervezés (adatgyűjtés, gyökérok elemzés). <strong>Do:</strong>
+                            Végrehajtás (kísérleti jelleggel). <strong>Check:</strong> Ellenőrzés (eredmények mérése).
+                            <strong>Act:</strong> Beavatkozás (szabványosítás vagy újratervezés).
+                        </p>
+                    </div>
+                    <div class="lean-card" style="border-color: #7e57c2;">
+                        <h4>Ishikawa (Halszálka)</h4>
+                        <p>A probléma forrását 5+1 kategóriában keressük: 1. Ember (E), 2. Gép (G), 3. Módszer (M), 4.
+                            Anyag (A), 5. Mérés (M), +1. Környezet (K). Segít túllépni a tüneti kezelésen.</p>
+                    </div>
+                    <div class="lean-card" style="border-color: #26c6da;">
+                        <h4>Pareto-elemzés</h4>
+                        <p>A 80/20 szabály alapján az okok kis része (20%) felelős a hibák nagy részéért (80%). Az
+                            erőforrásokat ezekre a kritikus pontokra kell összpontosítani a legnagyobb hatás érdekében.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lean-section">
+                <h3>4. Irodai Veszteségek (Muda)</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-muted);">A Lean Office célja az
+                    alábbi 8 veszteség típus azonosítása és eliminálása a folyamatokból. További részletek az
+                    <a href="https://leanszotar.hu/page.php?27" target="_blank"
+                        style="color:var(--primary); font-weight:700; text-decoration:none;">eredeti forrásban</a>
+                    találhatók:
+                </p>
+
+                <!-- Vizualizáció 5S -->
+                <div class="stat-grid" style="grid-template-columns: repeat(5, 1fr); margin: 3rem 0;">
+                    <div class="stat-card" style="border-top: 5px solid #03a9f4;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary);">1. SEIRI</span>
+                        <p class="small mb-0" style="color: var(--text-muted);">Válogatás</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 5px solid #2196f3;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary);">2. SEITON</span>
+                        <p class="small mb-0" style="color: var(--text-muted);">Rendszerezés</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 5px solid #3f51b5;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary);">3. SEISO</span>
+                        <p class="small mb-0" style="color: var(--text-muted);">Tisztítás</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 5px solid #673ab7;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary);">4. SEIKETSU</span>
+                        <p class="small mb-0" style="color: var(--text-muted);">Szabványosítás</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 5px solid #9c27b0;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary);">5. SHITSUKE</span>
+                        <p class="small mb-0" style="color: var(--text-muted);">Fenntartás</p>
+                    </div>
+                </div>
+
+                <div class="hint"
+                    style="background:#fff3e0; border-color:#ff9800; color:#e65100!important; margin: 2rem 0;">
+                    <i class="fas fa-eye me-2"></i><strong>Vizuális Menedzsment:</strong> Az 5S nem csak takarítás,
+                    hanem egy olyan állapot fenntartása, ahol a hibák (pl. hiányzó mappa, elmaradt feladat) azonnal
+                    szembeötlenek. A standardok teszik lehetővé, hogy bárki, bárhol tudja, mi a dolga.
+                </div>
+                <div class="table-responsive">
+                    <table style="width:100%; border-collapse: collapse; margin-top:1rem; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--bg-light);">
+                                <th style="padding:1rem; border:1px solid var(--border-color);">Veszteség típusa</th>
+                                <th style="padding:1rem; border:1px solid var(--border-color);">Irodai Példa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">
+                                    <strong>Túltermelés</strong>
+                                </td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Hosszabb riportok
+                                    készítése, mint amit kértek; információk küldése olyanoknak, akiknek nincs rá
+                                    szükségük.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">
+                                    <strong>Várakozás</strong>
+                                </td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Jóváhagyásra váró
+                                    dokumentumok; rendszerleállás miatti kényszerszünet; várakozás mások válaszára.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);"><strong>Felesleges
+                                        szállítás</strong></td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Többszöri email
+                                    fordítás;
+                                    dokumentumok fizikai mozgatása feleslegesen; csatolmányok küldése megosztott link
+                                    helyett.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);"><strong>Felesleges
+                                        mozgás</strong></td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Keresgélés a fájlok
+                                    között a rossz mappaszerkezet miatt; gyaloglás a távoli nyomtatóhoz.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);"><strong>Felesleges
+                                        feldolgozás</strong></td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Ugyanazon adatok
+                                    többszöri bevitele; feleslegesen magas minőség olyan helyen, ahol nem szükséges.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">
+                                    <strong>Készlet</strong>
+                                </td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Megválaszolatlan
+                                    emailek
+                                    tömege; elvégzésre váró, feltorlódott feladatok (backlog).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);"><strong>Hiba /
+                                        Utómunka</strong></td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Hibás adatbevitel
+                                    miatti
+                                    korrekció; nem egyértelmű utasítások miatti félreértések javítása.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">
+                                    <strong>Kihasználatlan
+                                        tudás</strong>
+                                </td>
+                                <td style="padding:0.75rem; border:1px solid var(--border-color);">Munkatársak
+                                    ötleteinek és
+                                    készségeinek figyelmen kívül hagyása; adminisztratív feladatokra pazarolt szaktudás.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table style="width:100%; border-collapse: collapse; margin-top:2rem; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background: var(--bg-light);">
+                            <th style="padding:1rem; border:1px solid var(--border-color);">Kategória</th>
+                            <th style="padding:1rem; border:1px solid var(--border-color);">Lean Eszköz</th>
+                            <th style="padding:1rem; border:1px solid var(--border-color);">Cél</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Rendezettség</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">5S (Válogatás, Rendszer,
+                                Tisztítás, Standard, Fegyelem)</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Átlátható munkatér</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Hiba-megelőzés</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Poka-Yoke
+                                (Hibázásmentesítés)</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Balgaság elleni védelem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Szabványosítás</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">SOP (Standard Operating
+                                Procedure)</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Azonos feladat azonos
+                                elvégzése</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Vizuális menedzsment</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Kanban / Shadow board
+                            </td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Azonnali
+                                állapotfelismerés</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Problémafeltárás</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">5 Miért (Root Cause
+                                Analysis)</td>
+                            <td style="padding:0.75rem; border:1px solid var(--border-color);">Gyökérok meghatározása
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <script src="../../js/main.js"></script>
+</body>
+
+</html>

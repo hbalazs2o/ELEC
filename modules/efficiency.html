@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatékonyság Javítás - Irodai Asszisztens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .efficiency-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #3949ab 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(92, 107, 192, 0.2);
+        }
+
+        .method-card {
+            background: var(--bg-card);
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .method-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .video-box {
+            background: #000;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Unified Header injected by header.js -->
+
+    <main class="container py-5 fade-in">
+        <div class="efficiency-hero">
+            <h1 style="font-family:'Outfit'; font-weight:800; font-size: 3rem; margin-bottom: 1rem;">Hatékonyság Javító
+                Módszerek</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Optimalizálja munkafolyamatait a modern irodai menedzsment
+                eszközeivel.</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="method-card">
+                    <h3 style="font-family:'Outfit'; font-weight:800; margin-bottom: 1.5rem;"><i
+                            class="fas fa-layer-group text-primary me-2"></i>Eisenhower-mátrix</h3>
+
+                    <!-- Mátrix Vizualizáció -->
+                    <div
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; background: var(--border-color); padding: 5px; border-radius: 1rem; margin-bottom: 1.5rem;">
+                        <div
+                            style="background: #ffebee; padding: 1rem; border-radius: 0.5rem; text-align: center; color: #000;">
+                            <div style="font-weight: 800; font-size: 0.7rem;">SÜRGŐS & FONTOS</div>
+                            <div style="font-size: 0.8rem; font-weight: 700;">TEDD MEG MOST</div>
+                        </div>
+                        <div
+                            style="background: #e3f2fd; padding: 1rem; border-radius: 0.5rem; text-align: center; color: #000;">
+                            <div style="font-weight: 800; font-size: 0.7rem;">NEM SÜRGŐS & FONTOS</div>
+                            <div style="font-size: 0.8rem; font-weight: 700;">ÜTEMEZZED BE</div>
+                        </div>
+                        <div
+                            style="background: #fff3e0; padding: 1rem; border-radius: 0.5rem; text-align: center; color: #000;">
+                            <div style="font-weight: 800; font-size: 0.7rem;">SÜRGŐS & NEM FONTOS</div>
+                            <div style="font-size: 0.8rem; font-weight: 700;">DELEGÁLD</div>
+                        </div>
+                        <div
+                            style="background: #f5f5f5; padding: 1rem; border-radius: 0.5rem; text-align: center; color: #000;">
+                            <div style="font-weight: 800; font-size: 0.7rem;">NEM SÜRGŐS & NEM FONTOS</div>
+                            <div style="font-size: 0.8rem; font-weight: 700;">HAGYD EL</div>
+                        </div>
+                    </div>
+
+                    <p>A feladatok osztályozása fontosság és sürgősség alapján segít a fókusz megtartásában és a kiégés
+                        megelőzésében. A legtöbb időt a <strong>kék (stratégiai)</strong> negyedben kellene töltenünk.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="method-card" style="border-right: 5px solid var(--accent);">
+                    <h3 style="font-family:'Outfit'; font-weight:800; margin-bottom: 1.5rem;"><i
+                            class="fas fa-brain text-accent me-2"></i>Deep Work (Mély munka)</h3>
+                    <p>Cal Newport koncepciója szerint a zavartalan, magas koncentrációt igénylő munka az egyetlen módja
+                        a komplex értékteremtésnek.</p>
+                    <div class="p-3 mb-3" style="background: var(--bg-light); border-radius: 1rem;">
+                        <ul style="padding-left: 1.25rem; font-size: 0.9rem;">
+                            <li>Nincs multitasking (e-mailek, telefon).</li>
+                            <li>Minimum 90 perces blokkok.</li>
+                            <li>Kognitív képességek határainak feszegetése.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="method-card">
+                    <h3 style="font-family:'Outfit'; font-weight:800; margin-bottom: 1.5rem;"><i
+                            class="fas fa-stopwatch text-primary me-2"></i>Pomodoro Technika</h3>
+                    <p>A fókuszált munkavégzés klasszikus módszere. Segít leküzdeni a halogatást azáltal, hogy a nagy
+                        feladatokat emészthető, 25 perces szakaszokra bontja:</p>
+                    <div style="display: flex; justify-content: space-around; align-items: center; margin: 1.5rem 0;">
+                        <div style="text-align: center;"><i class="fas fa-brain fa-2x text-primary"></i>
+                            <div style="font-size:0.7rem; font-weight:800;">25' FÓKUSZ</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                        <div style="text-align: center;"><i class="fas fa-mug-hot fa-2x text-success"></i>
+                            <div style="font-size:0.7rem; font-weight:800;">5' SZÜNET</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                        <div style="text-align: center;"><i class="fas fa-rotate fa-2x text-primary"></i>
+                            <div style="font-size:0.7rem; font-weight:800;">4x ISMÉTLÉS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="method-card">
+                    <h3 style="font-family:'Outfit'; font-weight:800; margin-bottom: 1.5rem;"><i
+                            class="fas fa-mobile-alt-slash text-primary me-2"></i>Digitális Detox</h3>
+                    <p>Az információs túlterheltség ellen:</p>
+                    <ul class="list-group list-group-flush" style="background: transparent;">
+                        <li class="list-group-item"
+                            style="background: transparent; color: var(--text-main); border-color: var(--border-color);">
+                            <i class="fas fa-bell-slash me-2 text-muted"></i> <strong>Hard Audit:</strong> Minden
+                            felesleges push-értesítés kikapcsolása.
+                        </li>
+                        <li class="list-group-item"
+                            style="background: transparent; color: var(--text-main); border-color: var(--border-color);">
+                            <i class="fas fa-hourglass-start me-2 text-muted"></i> <strong>Időkeret:</strong> Napi fix
+                            időpontok az e-mailek és hírek checkingjére.
+                        </li>
+                        <li class="list-group-item"
+                            style="background: transparent; color: var(--text-main); border-color: var(--border-color);">
+                            <i class="fas fa-moon me-2 text-muted"></i> <strong>Offline zónák:</strong> Meetingek és
+                            ebédidő alatt a telefon elrakása.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="method-card">
+                    <h4 style="font-family:'Outfit'; font-weight:800;"><i
+                            class="fas fa-check-double text-success me-2"></i>Audit és Reflexió</h4>
+                    <p>A hatékonyság nem statikus állapot. Minden hét végén tartson egy 15 perces visszatekintést:</p>
+                    <ul>
+                        <li>Mi volt a hét 3 legfontosabb eredménye?</li>
+                        <li>Mi vitte el a legtöbb felesleges időt?</li>
+                        <li>Min kell változtatni a jövő héten?</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="method-card">
+                    <h4 style="font-family:'Outfit'; font-weight:800;"><i
+                            class="fas fa-tools text-warning me-2"></i>Digitális Eszköztár</h4>
+                    <p>Használja az Irodai Asszisztens beépített moduljait a rendszerezéshez:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark p-2 border">Gyors Feljegyzés</span>
+                        <span class="badge bg-light text-dark p-2 border">Checklist</span>
+                        <span class="badge bg-light text-dark p-2 border">Adat Vizualizáció</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="method-card">
+            <h3 style="font-family:'Outfit'; font-weight:800; margin-bottom: 1.5rem;"><i
+                    class="fas fa-video text-primary me-2"></i>Oktató Videó: A Hatékonyság 5 Alappillére</h3>
+            <div class="video-box">
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="mt-4">
+                <h5>Rövid összefoglaló:</h5>
+                <ul class="text-muted">
+                    <li>A környezet rendezettsége (5S rendszer alkalmazása).</li>
+                    <li>Az információs zaj szűrése (értesítések kezelése).</li>
+                    <li>A "Deep Work" koncepciója.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/header.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+
+</html>
