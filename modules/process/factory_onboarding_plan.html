@@ -15,16 +15,36 @@
         onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}]});"></script>
     <!-- Chart.js for statistics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome and Global CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/main.css">
     <style>
-        :root {
+                :root {
+            /* Light theme variables */
             --bg-color: #f8fafc;
             --sidebar-bg: #0f172a;
-            --accent-primary: #003366;
-            --accent-secondary: #004488;
-            --text-heading: #000000;
-            --text-body: #000000;
+            --accent-primary: #2563eb;
+            --accent-secondary: #3b82f6;
+            --text-heading: #0f172a;
+            --text-body: #334155;
             --border-color: #e2e8f0;
-            --nanobanana-glow: rgba(0, 51, 102, 0.4);
+            --nanobanana-glow: rgba(37, 99, 235, 0.4);
+            --bg-card: #ffffff;
+            --text-dim: #64748b;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme variables */
+            --bg-color: #020617;
+            --sidebar-bg: #020617;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #60a5fa;
+            --text-heading: #f8fafc;
+            --text-body: #94a3b8;
+            --border-color: #1e293b;
+            --nanobanana-glow: rgba(59, 130, 246, 0.4);
+            --bg-card: #0f172a;
+            --text-dim: #475569;
         }
 
         * {
@@ -42,17 +62,25 @@
             background-color: var(--bg-color);
             color: var(--text-body);
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
 
+        /* Wrapper for sidebar + content */
+        .page-body {
+            display: flex;
+            flex: 1;
+        }
+
         /* Sidebar Navigation */
-        nav {
+        .sidebar-nav {
             width: 320px;
             background-color: var(--sidebar-bg);
             color: #fff;
             padding: 2rem;
-            height: 100vh;
+            height: calc(100vh - 56px);
             position: fixed;
+            top: 56px;
             overflow-y: auto;
             border-right: 1px solid var(--border-color);
         }
@@ -113,6 +141,7 @@
             flex: 1;
             padding: 0.5rem 1.5rem;
             max-width: none;
+            margin-top: 0;
         }
 
         .hero {
@@ -169,7 +198,7 @@
         }
 
         .tech-box {
-            background: #fff;
+            background: var(--bg-card);
             padding: 1rem;
             border-radius: 8px;
             border: 1px solid var(--border-color);
@@ -280,6 +309,8 @@
             color: #fff;
         }
 
+        .btn-tinkered { background: #4f46e5; color: #fff; }
+
         .btn-blueprint {
             background: #003366;
             color: #fff;
@@ -312,8 +343,10 @@
 </head>
 
 <body>
+<!-- header injected by js/header.js -->
+<div class="page-body">
 
-    <nav>
+    <nav class="sidebar-nav">
         <div class="nav-header">
             <h1><strong>Elektronikai gyár</strong></h1>
             <p>PROCESS ENGINEERING DIVISON</p>
@@ -350,6 +383,10 @@
                     <path d="M3 3h18v18H3zM9 9l6 6m0-6l-6 6" />
                 </svg>
                 BLUEPRINT.AM
+            </a>
+            <a href="https://app.tinkered.ai/" target="_blank" class="btn-tool btn-tinkered">
+                <i class="fas fa-robot" style="margin-right: 4px;"></i>
+                TINKERED AI
             </a>
 
         </div>
@@ -418,7 +455,7 @@
         </section>
 
         <!-- 02. <strong>SPI</strong> -->
-        <section id="spi">
+        <section style="display: flow-root;" id="spi">
             <h2>02. <strong>Solder Paste Inspection</strong> (<strong>SPI</strong>) Technológia</h2>
             <div class="illustration-container"
                 style="background:#0a1628; display:flex; align-itEMS:center; justify-content:center; overflow:hidden;">
@@ -557,8 +594,11 @@
         </section>
 
         <!-- 03. Placement -->
-        <section id="placement">
+        <section style="display: flow-root;" id="placement">
             <h2>03. High-Speed Component Placement</h2>
+            <div class="illustration-container" style="height: auto; background: transparent; box-shadow: none; border: none; float: right; width: 45%; margin: 0.5rem 0 1.5rem 2rem;">
+                <img src="img/img_placement.png" alt="High-Speed Placement" style="width:100%; max-height: 500px; height: auto; object-fit:contain; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            </div>
             <p>Az <strong>Elektronikai gyár</strong> sorain a sebesség és a pontosság harca folyik. A modern
                 <strong>Pick & Place</strong> gépek <span class="data-point">linear motor</span> hajtásúak, ahol a
                 pozicionálási hiba mikronos nagyságrendű.
@@ -578,7 +618,7 @@
         </section>
 
         <!-- 04. <strong>Reflow</strong> -->
-        <section id="<strong>reflow</strong>">
+        <section style="display: flow-root;" id="<strong>reflow</strong>">
             <h2>04. Termodinamika: A <strong>Reflow</strong> Folyamat Fizikája</h2>
             <p>A <strong>reflow</strong> kemence nem csak "melegít", hanem egy kémiát vezényel le. A forrasztási profil
                 (<strong>Thermal Profile</strong>)
@@ -616,8 +656,11 @@
         </section>
 
         <!-- 05. Wave -->
-        <section id="wave">
+        <section style="display: flow-root;" id="wave">
             <h2>05. <strong>Hullámforrasztás</strong> (Wave Soldering) és <strong>THT</strong> Dinamika</h2>
+            <div class="illustration-container" style="height: auto; background: transparent; box-shadow: none; border: none; float: right; width: 45%; margin: 0.5rem 0 1.5rem 2rem;">
+                <img src="img/img_wave.png" alt="Wave Soldering" style="width:100%; max-height: 500px; height: auto; object-fit:contain; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            </div>
             <p>A <strong>Hullámforrasztás</strong> a mechanikai integritás záloga a csatlakozók és nagyfeszültségű
                 alkatrészek esetén. A
                 folyadékmechanika törvényei (Bernoulli-elv) itt közvetlenül érvényesülnek a fúvókáknál.</p>
@@ -636,7 +679,7 @@
         </section>
 
         <!-- 06. Manual -->
-        <section id="manual">
+        <section style="display: flow-root;" id="manual">
             <h2>06. Kézi Forrasztás és <strong>IPC-A-610</strong> Standardok</h2>
             <p>Bár a <strong>Elektronikai gyár</strong> automatizált, a komplexitás (Military vagy Medical projektek)
                 megköveteli a manuális
@@ -651,13 +694,12 @@
         </section>
 
         <!-- 07. Quality -->
-        <section id="quality">
+        <section style="display: flow-root;" id="quality">
             <h2>07. Minőségbiztosítás: <strong>AOI</strong> és <strong>AXI</strong> Analízis</h2>
-            <div class="illustration-container"
-                style="height: auto; background: transparent; box-shadow: none; border: none;">
-                <img src="https://raw.githubusercontent.com/balage-energetix/IrodaAsszisztens/main/process/img/img_aoi.png"
+            <div class="illustration-container" style="height: auto; background: transparent; box-shadow: none; border: none; float: right; width: 45%; margin: 0.5rem 0 1.5rem 2rem;">
+                <img src="img/img_aoi.png"
                     alt="AOI Inspection System"
-                    style="width:100%; height: 400px; object-fit:cover; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    style="width:100%; max-height: 500px; height: auto; object-fit: contain; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
             </div>
             <p>Az <strong>AOI</strong> (Automatic Optical Inspection) a folyamatmérnök legfőbb visszajelző rendszere. Az
                 adatokból
@@ -680,12 +722,11 @@
         </section>
 
         <!-- 08. Reliability -->
-        <section id="reliability">
+        <section style="display: flow-root;" id="reliability">
             <h2>08. Megbízhatósági Vizsgálatok és Anyagtudomány</h2>
-            <div class="illustration-container"
-                style="height: auto; background: transparent; box-shadow: none; border: none;">
+            <div class="illustration-container" style="height: auto; background: transparent; box-shadow: none; border: none; float: right; width: 45%; margin: 0.5rem 0 1.5rem 2rem;">
                 <img src="img/img_reliability.png" alt="Reliability Climate Chamber"
-                    style="width:100%; height: 400px; object-fit:cover; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    style="width:100%; max-height: 500px; height: auto; object-fit: contain; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
             </div>
             <p>A termékek élettartam-szimulációja (<strong>HAST</strong> - Highly Accelerated Stress Test) során
                 kiderül, mennyire stabil
@@ -699,12 +740,11 @@
         </section>
 
         <!-- 09. Management -->
-        <section id="management">
+        <section style="display: flow-root;" id="management">
             <h2>09. <strong>Lean Management</strong> és Mérnöki Kultúra</h2>
-            <div class="illustration-container"
-                style="height: auto; background: transparent; box-shadow: none; border: none;">
+            <div class="illustration-container" style="height: auto; background: transparent; box-shadow: none; border: none; float: right; width: 45%; margin: 0.5rem 0 1.5rem 2rem;">
                 <img src="img/img_lean.png" alt="<strong>Lean Management</strong> Board"
-                    style="width:100%; height: 400px; object-fit:cover; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    style="width:100%; max-height: 500px; height: auto; object-fit: contain; border-radius:16px; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
             </div>
             <p>Az <strong>Elektronikai gyár</strong>-nál nem csak gyártunk, hanem folyamatosan javítunk. Az irodában a
                 te feladatod az
@@ -731,7 +771,7 @@
         </section>
 
         <!-- 10. Traceability -->
-        <section id="traceability">
+        <section style="display: flow-root;" id="traceability">
             <h2>11. Traceability: Teljes körű Nyomonkövethetőség a Gyártásban</h2>
             <p>Az <strong>Elektronikai gyár</strong> üzemében a <strong>Traceability</strong> nem csupán egy vevői
                 elvárás, hanem a minőségbiztosítás alapköve. Minden egyes alkatrész (<strong>Article Number</strong>)
@@ -798,7 +838,7 @@
         </section>
 
         <!-- 12. Calculations -->
-        <section id="calculations">
+        <section style="display: flow-root;" id="calculations">
             <h2>11. Mérnöki Számítások és Képletek</h2>
             <p>Egy folyamatmérnök munkája nem ér véget a megfigyelésnél; az adatok számszerűsítése és a fizikai
                 törvényszerűségek alkalmazása elengedhetetlen a prediktív karbantartáshoz és folyamat-optimalizáláshoz.
@@ -857,19 +897,24 @@
                 <div class="tech-box">
                     <span class="label">PÉLDA 02</span>
                     <img src="img/img_oee.png" alt="<strong>OEE</strong> Gauge Visualization"
-                        style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:1rem;display:block;">
+                        style="width:100%;height:150px;object-fit: contain;border-radius:8px;margin-bottom:1rem;display:block;">
                     <h3><strong>OEE</strong> (Overall Equipment Effectiveness) kalkuláció</h3>
                     <p>Az <strong>Elektronikai gyár</strong> SMT sorának hatékonysága egy 8 órás műszakban:</p>
                     <div class="math-box" style="font-size:1.1rem; margin-bottom:1rem;">
                         \[OEE = A \times P \times Q = 0.875 \times 0.90 \times 0.985 \approx 77.6\%\]
                     </div>
+                    <ul class="tech-list" style="margin-top: 0; font-size: 0.9rem; padding-left: 1rem;">
+                        <li style="margin-bottom: 0.5rem;"><strong>A (Availability - Rendelkezésre állás):</strong> A valós működési idő aránya a tervezett üzemidőhöz képest (pl. leállások, karbantartás, átállás miatt).<br><span class="data-point">Mértékegység: Százalék (%) vagy arányszám (pl. 0.875 = 87.5%)</span></li>
+                        <li style="margin-bottom: 0.5rem;"><strong>P (Performance - Teljesítmény):</strong> A valós gyártási sebesség a gép ideális/maximális kapacitásához képest (mikroleállások, lassulás miatt).<br><span class="data-point">Mértékegység: Százalék (%) vagy arányszám (pl. 0.90 = 90.0%)</span></li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Q (Quality - Minőség):</strong> A hibátlanul (javítás nélkül) legyártott jó termékek aránya az összes legyártott darabhoz képest.<br><span class="data-point">Mértékegység: Százalék (%) vagy arányszám (pl. 0.985 = 98.5%)</span></li>
+                    </ul>
                 </div>
 
                 <!-- 03 <strong>Area Ratio</strong> -->
                 <div class="tech-box">
                     <span class="label">PÉLDA 03</span>
                     <img src="img/img_ar.png" alt="Stencil Aperture <strong>Area Ratio</strong>"
-                        style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:1rem;display:block;">
+                        style="width:100%;height:150px;object-fit: contain;border-radius:8px;margin-bottom:1rem;display:block;">
                     <h3>Stencil Apertúra <strong>Area Ratio</strong> (\(A_r\))</h3>
                     <p>A paszta-kioldás sikerességének predikciója egy 0.4mm pitch-ű <strong>BGA</strong> esetén.
                         Apertúra átmérő: \(D =
@@ -885,7 +930,7 @@
                 <div class="tech-box">
                     <span class="label">PÉLDA 04</span>
                     <img src="img/img_imc.png" alt="IMC IntermeTALlic Layer SEM"
-                        style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:1rem;display:block;">
+                        style="width:100%;height:150px;object-fit: contain;border-radius:8px;margin-bottom:1rem;display:block;">
                     <h3><u>Arrhenius-egyenlet</u>: IMC réteg növekedése</h3>
                     <p>Az intermeTALlikus réteg vastagságának (\(x\)) becslése 125 °C-os tárolás után 1000 óra
                         elteltével.</p>
@@ -900,7 +945,7 @@
                 <div class="tech-box">
                     <span class="label">PÉLDA 05</span>
                     <img src="img/img_takt.png" alt="<strong>Takt Time</strong> Oscilloscope"
-                        style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:1rem;display:block;">
+                        style="width:100%;height:150px;object-fit: contain;border-radius:8px;margin-bottom:1rem;display:block;">
                     <h3><strong>Takt Time</strong> vs. <strong>Cycle Time</strong></h3>
                     <p>Vevői igény: 1200 darab / műszak (7.5 óra nettó).</p>
                     <div class="math-box" style="font-size:1.1rem; margin-bottom:1rem;">
@@ -1122,7 +1167,7 @@
         </section>
 
         <!-- 12. Statistics -->
-        <section id="statistics">
+        <section style="display: flow-root;" id="statistics">
             <h2>12. Folyamat Statisztikák és KPI Analitika</h2>
             <p>A gyártás során gyűjtött adatok vizualizációja segít a trendek felismerésében és a preventív
                 beavatkozásban. Az alábbi grafikonok az üzem tipikus mutatóit szemléltetik.</p>
@@ -1156,7 +1201,7 @@
         </section>
 
         <!-- 13. Valós Életbeli Számítások -->
-        <section id="realcalc">
+        <section style="display: flow-root;" id="realcalc">
             <h2>13. Valós Életbeli Számítások – 5 Részletes Esettanulmány</h2>
             <p>A következő fejezet öt, az <strong>Elektronikai gyár</strong> üzemének mindennapi valóságából merített
                 mérnöki számítást mutat be
@@ -1298,7 +1343,7 @@
         </section>
 
         <!-- 14. <strong>ESD Védelem</strong> és <strong>EPA</strong> -->
-        <section id="esd">
+        <section style="display: flow-root;" id="esd">
             <h2>14. <strong>ESD Védelem</strong> és <strong>EPA</strong> (ESD Protected Area) Tervezés a Gyártósoron
             </h2>
             <p>Az elektrosztatikus kisülés (ESD) láthatatlan és csendes, mégis az egyik legfőbb oka a latens hibáknak az
@@ -1381,7 +1426,7 @@
         </section>
 
         <!-- 15. Szakmai Fejlődés -->
-        <section id="development">
+        <section style="display: flow-root;" id="development">
             <h2>15. Szakmai Fejlődés, Karrierút és Tudásmenedzsment</h2>
             <p>Az <strong>Elektronikai gyár</strong> üzemében eltöltött évek nemcsak a gyártástechnológiai tudást
                 fejlesztik, hanem
@@ -1492,6 +1537,10 @@
         </footer>
     </main>
 
+    </div><!-- end .page-body -->
+
+    <script src="../../js/header.js"></script>
+    <script src="../../js/main.js"></script>
     <script>
         // Statistics Charts
         const defectCtx = document.getElementById('defectChart').getContext('2d');

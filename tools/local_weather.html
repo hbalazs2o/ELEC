@@ -1,37 +1,110 @@
-<!DOCTYPE html>
-<html lang="hu" data-theme="dark">
+﻿<!DOCTYPE html>
+<html lang="hu" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Időjárás - ELEC</title>
+    <title>Időjárás - Irodai Asszisztens</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .graph-container { margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .graph-card { background: var(--bg-hover); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s ease; }
+        .graph-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .graph-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main); }
+        .graph-img { width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-top: auto; }
+        .webcam-frame { width: 100%; height: 350px; border: none; border-radius: 8px; }
+        
+        @media (max-width: 768px) {
+            .graph-container { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 
 <body class="module-body">
-    <!-- Unified Header injected by header.js -->
-
     <div class="module-container">
-        <div class="module-content-wrapper">
-            <h1>Helyi Időjárás (Nagyatád)</h1>
-            
-            <div style="margin: 2rem 0;">
-                <p><strong>Hőmérséklet:</strong> <span id="weather-temp">--°C</span></p>
-                <p><strong>Szélsebesség:</strong> <span id="weather-wind">-- km/h</span></p>
-                <p><strong>Páratartalom:</strong> <span id="weather-humid">--%</span></p>
-                <p><strong>Légnyomás:</strong> <span id="weather-press">-- hPa</span></p>
+        <header class="module-header">
+            <div class="module-title">
+                <i class="fas fa-cloud-sun"></i>
+                <span>Helyi Időjárás & Élő Kamera</span>
+            </div>
+            <a href="../index.html" class="module-back">
+                <i class="fas fa-arrow-left"></i>
+                Vissza a főoldalra
+            </a>
+        </header>
+
+        <div class="module-content">
+            <!-- WEBCAM BUTTONS -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <a href="https://www.idokep.hu/webkamera/fonyodvarhegy" target="_blank" class="graph-card" style="flex: 1; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 12px; text-decoration: none; border: 1px solid var(--primary); background: rgba(37, 99, 235, 0.1);">
+                    <i class="fas fa-video" style="font-size: 1.1rem; color: var(--primary);"></i>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-main);">WEBKAMERA 1</div>
+                        <div style="font-size: 0.6rem; color: var(--text-muted);">Várhegy - Észak</div>
+                    </div>
+                </a>
+                <a href="https://www.idokep.hu/webkamera/fonyodvarhegy2" target="_blank" class="graph-card" style="flex: 1; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 12px; text-decoration: none; border: 1px solid var(--primary); background: rgba(37, 99, 235, 0.1);">
+                    <i class="fas fa-video" style="font-size: 1.1rem; color: var(--primary);"></i>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-main);">WEBKAMERA 2</div>
+                        <div style="font-size: 0.6rem; color: var(--text-muted);">Várhegy - Dél</div>
+                    </div>
+                </a>
             </div>
 
-            <p>Az adatok automatikusan frissülnek a központi rendszerből.</p>
+            <div class="graph-container">
+                <!-- TRENDS -->
+                <div class="graph-card">
+                    <div class="graph-title"><i class="fas fa-chart-line"></i> Hőmérsékleti trend</div>
+                    <img id="graph-hom" src="https://www.idokep.hu/automata/varhegy_hom.png" class="graph-img" alt="Hőmérséklet">
+                </div>
+                
+                <div class="graph-card">
+                    <div class="graph-title"><i class="fas fa-compass"></i> Szélirány trend</div>
+                    <img id="graph-szelirany" src="https://www.idokep.hu/automata/varhegy_szelirany.png" class="graph-img" alt="Szélirány">
+                </div>
+                
+                <div class="graph-card">
+                    <div class="graph-title"><i class="fas fa-wind"></i> Szélsebesség trend</div>
+                    <img id="graph-szelero" src="https://www.idokep.hu/automata/varhegy_szelero.png" class="graph-img" alt="Szélsebesség">
+                </div>
+                
+                <div class="graph-card">
+                    <div class="graph-title"><i class="fas fa-tint"></i> Páratartalom trend</div>
+                    <img id="graph-rh" src="https://www.idokep.hu/automata/varhegy_rh.png" class="graph-img" alt="Páratartalom">
+                </div>
+                
+                <div class="graph-card">
+                    <div class="graph-title"><i class="fas fa-compress-arrows-alt"></i> Légnyomás trend</div>
+                    <img id="graph-p" src="https://www.idokep.hu/automata/varhegy_p.png" class="graph-img" alt="Légnyomás">
+                </div>
+            </div>
+            
+            <a href="https://www.idokep.hu/automata/varhegy" target="_blank" class="graph-card" style="display: block; margin-top: 1.5rem; text-decoration: none; color: var(--text-main); font-weight: 800; text-align: center; border: 1px dashed var(--border); transition: border-color 0.2s;">
+                <i class="fas fa-external-link-alt" style="color: var(--primary); margin-right: 8px;"></i>
+                Teljes Időkép Adattábla Megnyitása
+            </a>
         </div>
     </div>
 
     <script src="../js/header.js"></script>
     <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const t = Date.now();
+            const graphs = ['hom', 'szelirany', 'szelero', 'rh', 'p'];
+            const ids = ['graph-hom', 'graph-szelirany', 'graph-szelero', 'graph-rh', 'graph-p'];
+            
+            // Csak a grafikonokat frissítjük a cache-elés ellen
+            for (let i = 0; i < ids.length; i++) {
+                const el = document.getElementById(ids[i]);
+                if (el) el.src = `https://www.idokep.hu/automata/varhegy_${graphs[i]}.png?t=${t}`;
+            }
+        });
+    </script>
 </body>
-
 </html>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="hu" data-theme="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,25 +10,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../css/main.css">
     <style>
-        body { margin: 0; overflow: hidden; background: #000; }
+        body { margin: 0; overflow: hidden; background: #0f172a; }
         
         #ui {
             position: absolute;
             top: 100px;
             left: 20px;
             color: white;
-            background: rgba(0,0,0,0.8);
+            background: rgba(15, 23, 42, 0.9);
             padding: 1.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.4);
             pointer-events: none;
             z-index: 10;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-family: 'Inter', sans-serif;
+            min-width: 240px;
         }
 
         #overlay {
             position: fixed;
             inset: 0;
-            background: #000;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -37,23 +40,75 @@
             color: white;
             z-index: 1000;
             cursor: pointer;
-            transition: opacity 0.5s;
+            transition: opacity 0.5s, visibility 0.5s;
+            text-align: center;
+            padding: 20px;
         }
 
         #crosshair {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 4px;
-            height: 4px;
-            background: white;
+            width: 8px;
+            height: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            opacity: 0.5;
+            z-index: 5;
+        }
+
+        .controls-hint {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 2rem;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hint-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .hint-key {
+            background: #f8fafc;
+            color: #0f172a;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-family: monospace;
+            font-size: 0.8rem;
+            box-shadow: 0 3px 0 #cbd5e1;
         }
 
         canvas { display: block; }
+
+        /* Dynamic Minimap */
+        #minimap {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 180px;
+            height: 180px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            z-index: 10;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        #minimap-canvas {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 
@@ -61,22 +116,48 @@
     <!-- Unified Header injected by header.js -->
 
     <div id="overlay">
-        <h1 style="font-family: 'Outfit'; font-weight: 800; font-size: 3rem;">3D TOUR</h1>
-        <p>Kattintson a belépéshez</p>
-        <div style="margin-top: 2rem; opacity: 0.6; font-size: 0.8rem; text-align: center;">
-            WASD: Mozgás | EGÉR: Nézelődés | SHIFT: Futás | ESC: Kilépés
+        <div style="background: rgba(15, 23, 42, 0.95); padding: 45px 65px; border-radius: 24px; border: 1px solid rgba(59, 130, 246, 0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.6); max-width: 650px;">
+            <i class="fas fa-industry" style="font-size: 4.5rem; color: #3b82f6; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));"></i>
+            <h1 style="font-family: 'Outfit'; font-weight: 800; font-size: 2.6rem; margin: 0 0 0.5rem 0; letter-spacing: 1px; color: #fff;">ELEC OKOSGYÁR BEJÁRÁS</h1>
+            <p style="color: #94a3b8; font-size: 1.15rem; margin-bottom: 2rem; line-height: 1.6;">Nappali, ultrarealisztikus 3D szimuláció a fonyódi napelemes gyár és a nagyteljesítményű SMT sor bemutatására.</p>
+            
+            <button style="padding: 16px 36px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 1.2rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4); text-transform: uppercase; letter-spacing: 1px;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
+                Belépés a szimulációba
+            </button>
+
+            <div class="controls-hint">
+                <div class="hint-item"><span class="hint-key">W,A,S,D</span> <span style="color: #cbd5e1;">Mozgás</span></div>
+                <div class="hint-item"><span class="hint-key">EGÉR</span> <span style="color: #cbd5e1;">Körülnézés</span></div>
+                <div class="hint-item"><span class="hint-key">SHIFT</span> <span style="color: #cbd5e1;">Gyors futás</span></div>
+                <div class="hint-item"><span class="hint-key">ESC</span> <span style="color: #cbd5e1;">Menü / Kilépés</span></div>
+            </div>
         </div>
     </div>
 
     <div id="ui">
-        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6;">Távolság</div>
-        <div style="font-size: 1.5rem; font-weight: 800;"><span id="distance">0.0</span> m</div>
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 1rem 0;">
-        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6;">Helyszín</div>
-        <div id="location" style="font-weight: 600;">Bejárat</div>
+        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; color: #60a5fa; font-weight: 800;">Aktuális Helyszín</div>
+        <div id="location" style="font-size: 1.45rem; font-weight: 800; margin-top: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); color: #fff;">Udvar</div>
+        
+        <hr style="border: 0; border-top: 1px solid rgba(59, 130, 246, 0.3); margin: 0.8rem 0;">
+        
+        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; color: #60a5fa; font-weight: 800;">Megtett Távolság</div>
+        <div style="font-size: 1.3rem; font-weight: 800; margin-top: 2px; color: #fff;"><span id="distance" style="font-variant-numeric: tabular-nums;">0.0</span> m</div>
+        
+        <hr style="border: 0; border-top: 1px solid rgba(59, 130, 246, 0.3); margin: 0.8rem 0;">
+        
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.6; color: #94a3b8;">Energetikai Hálózat</div>
+        <div style="font-size: 0.75rem; margin-top: 5px; display: flex; flex-direction: column; gap: 4px; color: #cbd5e1;">
+            <div style="display: flex; justify-content: space-between;"><span>PV Termelés:</span> <span style="color: #10b981; font-weight: 800;"><i class="fas fa-sun" style="margin-right: 4px;"></i> 340 kW</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>Hálózati Visszatápl.:</span> <span style="color: #10b981; font-weight: 800;">AKTÍV</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>Üzemi Fogyasztás:</span> <span style="color: #60a5fa; font-weight: 800;">185 kW</span></div>
+        </div>
     </div>
 
     <div id="crosshair"></div>
+
+    <div id="minimap">
+        <canvas id="minimap-canvas"></canvas>
+    </div>
 
     <script type="importmap">
         {
@@ -91,14 +172,132 @@
         import * as THREE from 'three';
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
+        // 1. Procedural Texture Generators
+        function createSolarPanelTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0f1e36'; ctx.fillRect(0, 0, 256, 256);
+            ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 3;
+            for(let i=0; i<=256; i+=32) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(256, i); ctx.stroke();
+            }
+            ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 1;
+            for(let i=16; i<256; i+=32) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+            }
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createTechFloorTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, 512, 512);
+            ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 8;
+            for(let i=0; i<=512; i+=128) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+            }
+            ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+            for(let i=64; i<512; i+=128) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+            }
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createSMTTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, 512, 512);
+            
+            // Add details: glass panels, warning stripes, UI screens
+            ctx.fillStyle = '#020617'; ctx.fillRect(40, 100, 430, 200); // Main window
+            
+            // Grid lines on window
+            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2;
+            ctx.strokeRect(40, 100, 430, 200);
+            
+            // Warning stripes bottom
+            ctx.fillStyle = '#eab308';
+            for (let i = 0; i < 512; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 450); ctx.lineTo(i + 20, 450);
+                ctx.lineTo(i + 40, 512); ctx.lineTo(i + 20, 512);
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.fillStyle = '#0f172a';
+            for (let i = 20; i < 512; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 450); ctx.lineTo(i + 20, 450);
+                ctx.lineTo(i + 40, 512); ctx.lineTo(i + 20, 512);
+                ctx.closePath(); ctx.fill();
+            }
+
+            // Buttons / Digital Display
+            ctx.fillStyle = '#0f172a'; ctx.fillRect(60, 340, 120, 80);
+            ctx.fillStyle = '#22c55e'; ctx.fillRect(70, 350, 40, 20); // Green display
+            ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(150, 380, 12, 0, Math.PI*2); ctx.fill(); // Stop button
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Blueprint-accurate facade: beige plaster with 3 horizontal aluminium window bands
+        function createFactoryFacadeTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            // Beige/cream plaster base
+            ctx.fillStyle = '#ddd5c2'; ctx.fillRect(0, 0, 1024, 512);
+            // Subtle vertical panel lines (structural)
+            ctx.strokeStyle = '#c8bfad'; ctx.lineWidth = 2;
+            for(let x = 0; x < 1024; x += 64) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,512); ctx.stroke(); }
+            // 3 horizontal window bands at floor levels (aluminium frames)
+            const bands = [
+                { y: 30,  h: 90 },   // Ground floor: +0.00 to +3.50
+                { y: 175, h: 90 },   // 1st floor:    +3.50 to +7.00
+                { y: 320, h: 80 }    // 2nd floor:    +7.00 to +10.00
+            ];
+            bands.forEach(b => {
+                // Window band background (aluminium frame colour)
+                ctx.fillStyle = '#8fa3b5'; ctx.fillRect(0, b.y, 1024, b.h);
+                // Individual window panes
+                ctx.fillStyle = '#b8d4e8';
+                for(let x = 6; x < 1024; x += 68) {
+                    ctx.fillRect(x + 4, b.y + 6, 58, b.h - 12);
+                    // Window frame dividers
+                    ctx.fillStyle = '#7a95a8'; ctx.fillRect(x + 32, b.y + 6, 2, b.h - 12);
+                    ctx.fillStyle = '#b8d4e8';
+                }
+                // Horizontal frame strip top and bottom
+                ctx.fillStyle = '#6e8899'; ctx.fillRect(0, b.y, 1024, 5);
+                ctx.fillRect(0, b.y + b.h - 5, 1024, 5);
+            });
+            // Parapet / cornice line at top
+            ctx.fillStyle = '#b0a898'; ctx.fillRect(0, 420, 1024, 92);
+            ctx.fillStyle = '#9a9080'; ctx.fillRect(0, 420, 1024, 8);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // 2. Setup Scene, Camera, Renderer
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x080c14);
-        scene.fog = new THREE.Fog(0x080c14, 20, 150);
+        
+        // Crisp, bright daylight sky color
+        scene.background = new THREE.Color(0xdbeafe);
+        scene.fog = new THREE.Fog(0xdbeafe, 100, 450);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.25;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.body.appendChild(renderer.domElement);
 
         const controls = new PointerLockControls(camera, document.body);
@@ -107,15 +306,17 @@
         overlay.addEventListener('click', () => controls.lock());
         controls.addEventListener('lock', () => {
             overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 500);
+            setTimeout(() => overlay.style.visibility = 'hidden', 500);
         });
         controls.addEventListener('unlock', () => {
-            overlay.style.display = 'flex';
+            overlay.style.visibility = 'visible';
             setTimeout(() => overlay.style.opacity = '1', 10);
         });
 
+        // 3. Inputs
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false, isRunning = false;
-        let velocity = new THREE.Vector3(), direction = new THREE.Vector3(), totalDistance = 0, prevPosition = new THREE.Vector3();
+        let velocity = new THREE.Vector3(), direction = new THREE.Vector3();
+        let totalDistance = 0, prevPosition = new THREE.Vector3();
 
         document.addEventListener('keydown', (e) => {
             switch (e.code) {
@@ -137,57 +338,521 @@
             }
         });
 
-        // World
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
-        const wallMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.9 });
-        const accentMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6 });
+        // 4. Materials
+        const techFloorTex = createTechFloorTexture();
+        techFloorTex.wrapS = THREE.RepeatWrapping;
+        techFloorTex.wrapT = THREE.RepeatWrapping;
+        techFloorTex.repeat.set(20, 20);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const sun = new THREE.DirectionalLight(0xffffff, 1);
-        sun.position.set(50, 100, 50);
-        scene.add(sun);
+        const facadeTex = createFactoryFacadeTexture();
+        facadeTex.wrapS = THREE.RepeatWrapping;
+        facadeTex.wrapT = THREE.RepeatWrapping;
+        facadeTex.repeat.set(8, 4);
 
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        scene.add(floor);
+        const intFloorMat = new THREE.MeshStandardMaterial({ map: techFloorTex, roughness: 0.15, metalness: 0.1 });
+        const extFloorMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.75 }); // Light gray asphalt
+        const grassMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.9 }); // Bright healthy lawn
+        
+        // Beautiful bright silver architectural panel material
+        const wallMat = new THREE.MeshStandardMaterial({ map: facadeTex, roughness: 0.4, metalness: 0.2 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.35, roughness: 0.05, transmission: 0.9, thickness: 1 });
+        const yellowLineMat = new THREE.MeshStandardMaterial({ color: 0xeab308 });
+        const metalStructureMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.2 });
+        
+        // 5. Build Environment
+        // ─── Ground plane ───────────────────────────────────────────────────
+        const asphalt = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), extFloorMat);
+        asphalt.rotation.x = -Math.PI / 2; asphalt.receiveShadow = true; scene.add(asphalt);
 
-        // Simple boxes as placeholders for factory elements
-        for(let i=0; i<10; i++) {
-            const box = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 6), wallMat);
-            box.position.set(Math.random()*100-50, 1.5, Math.random()*100-50);
-            scene.add(box);
+        // Green areas left, right and behind
+        [[- 280, 0], [280, 0]].forEach(([x, z]) => {
+            const g = new THREE.Mesh(new THREE.PlaneGeometry(150, 900), grassMat);
+            g.rotation.x = -Math.PI / 2; g.position.set(x, 0.02, z); scene.add(g);
+        });
+        const grassBack = new THREE.Mesh(new THREE.PlaneGeometry(600, 150), grassMat);
+        grassBack.rotation.x = -Math.PI / 2; grassBack.position.set(0, 0.02, -250); scene.add(grassBack);
+
+        // ─── Building skin materials ─────────────────────────────────────────
+        const facadeTex2 = createFactoryFacadeTexture();
+        facadeTex2.wrapS = THREE.RepeatWrapping; facadeTex2.wrapT = THREE.RepeatWrapping;
+        facadeTex2.repeat.set(6, 1);
+        const beigeMat   = new THREE.MeshStandardMaterial({ map: facadeTex2, roughness: 0.75, metalness: 0.02 });
+        const darkBeigeMat= new THREE.MeshStandardMaterial({ color: 0xc8bfad, roughness: 0.8 });
+        const concreteMat = new THREE.MeshStandardMaterial({ color: 0xa09890, roughness: 0.9 });
+        const winGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xa8ccdf, transparent: true, opacity: 0.75, roughness: 0.05, metalness: 0.2 });
+        const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x7a8fa0, roughness: 0.4, metalness: 0.5 });
+        const metalStructureMat2 = new THREE.MeshStandardMaterial({ color: 0x5a6a78, metalness: 0.85, roughness: 0.2 });
+        const roofMat     = new THREE.MeshStandardMaterial({ color: 0x7a8085, roughness: 0.85 });
+        const blueStripeMat = new THREE.MeshStandardMaterial({ color: 0x4a7fb5, roughness: 0.3, metalness: 0.3 });
+
+        // Interior floor
+        const intFloor = new THREE.Mesh(new THREE.PlaneGeometry(200, 35), intFloorMat);
+        intFloor.rotation.x = -Math.PI / 2; intFloor.position.set(0, 0.1, 0); intFloor.receiveShadow = true; scene.add(intFloor);
+
+        // Window helper
+        function addWindow(x, y, z, w, h, ry) {
+            const fr = new THREE.Mesh(new THREE.BoxGeometry(w+0.4, h+0.4, 0.3), winFrameMat);
+            fr.position.set(x, y, z); fr.rotation.y = ry||0; scene.add(fr);
+            const gl = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.15), winGlassMat);
+            gl.position.set(x, y, ry ? z : z+0.1); gl.rotation.y = ry||0; scene.add(gl);
         }
 
-        camera.position.set(0, 2, 20);
+        // ─── MAIN BUILDING (blueprint: single wide 3-storey block) ───────────
+        // Blueprint north elevation: 19,200mm wide, 3 floors, 10m total height
+        // In 3D units (1 unit = 1 meter): width=120, depth=22, height=10.5
+        const bldW=120, bldD=22, bldH=10.5;
+        const bldCX=0, bldCZ=0;
+        const bFrontZ = bldCZ + bldD/2;  // Z = 11
+        const bBackZ  = bldCZ - bldD/2;  // Z = -11
+
+        const mainBody = new THREE.Mesh(new THREE.BoxGeometry(bldW, bldH, bldD), beigeMat);
+        mainBody.position.set(bldCX, bldH/2, bldCZ);
+        mainBody.castShadow = true; mainBody.receiveShadow = true;
+        scene.add(mainBody);
+
+        // Concrete parapet
+        const mainParapet = new THREE.Mesh(new THREE.BoxGeometry(bldW+0.5, 1.2, bldD+0.5), concreteMat);
+        mainParapet.position.set(bldCX, bldH+0.6, bldCZ); scene.add(mainParapet);
+
+        // Structural pilasters every 8m across front
+        for (let px = bldCX - bldW/2; px <= bldCX + bldW/2; px += 8) {
+            const pil = new THREE.Mesh(new THREE.BoxGeometry(0.6, bldH+1, 0.7), concreteMat);
+            pil.position.set(px, bldH/2, bFrontZ+0.35); scene.add(pil);
+        }
+
+        // 3 bands of horizontal windows on FRONT face — match blueprint window bands
+        const frontZ = bFrontZ; // alias
+        const winRows = [{y:1.8,h:2.2},{y:5.0,h:2.2},{y:8.0,h:1.8}];
+        winRows.forEach(r => {
+            for(let col=0; col<14; col++) {
+                const wx = bldCX - 56 + col*8.5;
+                addWindow(wx, r.y, frontZ+0.3, 5.5, r.h, 0);
+            }
+        });
+
+        // Windows on BACK face
+        winRows.forEach(r => {
+            for(let col=0; col<14; col++) {
+                const wx = bldCX - 56 + col*8.5;
+                addWindow(wx, r.y, bBackZ-0.3, 5.5, r.h, Math.PI);
+            }
+        });
+
+        // Side windows (left & right)
+        [-bldW/2-0.3, bldW/2+0.3].forEach((sx, side) => {
+            winRows.forEach(r => {
+                for(let i=0;i<2;i++) {
+                    addWindow(sx, r.y, bldCZ-5+i*10, 4.5, r.h, Math.PI/2);
+                }
+            });
+        });
+
+        // ─── GLASS ENTRANCE — central, matches blueprint cms logo position ──
+        const entW=10, entH=bldH, entD=3;
+        const lobGlassMat = new THREE.MeshPhysicalMaterial({color:0x8ec8e0,transparent:true,opacity:0.45,roughness:0.05,transmission:0.8,thickness:1});
+        const lobby = new THREE.Mesh(new THREE.BoxGeometry(entW, entH, entD), lobGlassMat);
+        lobby.position.set(bldCX, entH/2, bFrontZ+entD/2); scene.add(lobby);
+        // Steel door frames
+        [[-4,0],[4,0]].forEach(([dx]) => {
+            const f = new THREE.Mesh(new THREE.BoxGeometry(0.4, entH, entD), metalStructureMat2);
+            f.position.set(bldCX+dx, entH/2, bFrontZ+entD/2); scene.add(f);
+        });
+        // Canopy overhang
+        const canopy = new THREE.Mesh(new THREE.BoxGeometry(16,0.5,4), concreteMat);
+        canopy.position.set(bldCX, bldH+0.25, bFrontZ+2); scene.add(canopy);
+
+        // ─── ROOF ────────────────────────────────────────────────────────────
+        const mainRoof = new THREE.Mesh(new THREE.PlaneGeometry(bldW+1, bldD+1), roofMat);
+        mainRoof.rotation.x = -Math.PI/2; mainRoof.position.set(bldCX, bldH+0.01, bldCZ); scene.add(mainRoof);
+
+        // HVAC units on roof (blueprint shows them left side)
+        const hvacMat = new THREE.MeshStandardMaterial({color:0x7090a0,roughness:0.5,metalness:0.6});
+        [[-50,5],[-38,-3],[-28,5],[-16,-2]].forEach(([hx,hz]) => {
+            const h = new THREE.Mesh(new THREE.BoxGeometry(8,2.5,5), hvacMat);
+            h.position.set(hx, bldH+1.5, hz); h.castShadow=true; scene.add(h);
+            // Exhaust pipe
+            const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,1.5), metalStructureMat2);
+            pipe.position.set(hx+2, bldH+3.2, hz); scene.add(pipe);
+        });
+
+        // ─── OUTDOOR TREES ──────────────────────────────────────────────────
+        function createLowPolyTree(x, z) {
+            const tg = new THREE.Group(); tg.position.set(x, 0, z);
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 3), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 }));
+            trunk.position.y = 1.5; trunk.castShadow = true; tg.add(trunk);
+            const fc = [0x14532d, 0x166534, 0x15803d];
+            const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(2.4), new THREE.MeshStandardMaterial({ color: fc[Math.floor(Math.random()*3)], roughness: 0.9 }));
+            leaves.position.y = 4.5; leaves.castShadow = true; tg.add(leaves);
+            scene.add(tg);
+        }
+        for (let i = 0; i < 12; i++) {
+            createLowPolyTree(-150, -200 + i * 38);
+            createLowPolyTree(155, -200 + i * 38);
+        }
+        createLowPolyTree(-12, bFrontZ + 20);
+        createLowPolyTree(14, bFrontZ + 20);
+
+        // ─── ROOFTOP SOLAR (right half of roof — blueprint NAPELEM MEZŐK) ──
+        const solarPanelTex = createSolarPanelTexture();
+        const solarMat = new THREE.MeshStandardMaterial({ map: solarPanelTex, roughness: 0.1, metalness: 0.8 });
+        for (let row = 0; row < 2; row++) {
+            for (let col = 0; col < 7; col++) {
+                const pg = new THREE.Group();
+                pg.position.set(bldCX + 18 + col * 12, bldH + 0.25, bldCZ - 4 + row * 9);
+                const base = new THREE.Mesh(new THREE.BoxGeometry(11, 0.25, 5), metalStructureMat2);
+                base.rotation.x = 0.2; pg.add(base);
+                const pv = new THREE.Mesh(new THREE.BoxGeometry(10.5, 0.08, 4.6), solarMat);
+                pv.rotation.x = 0.2; pv.position.y = 0.12; pg.add(pv);
+                scene.add(pg);
+            }
+        }
+        // ─── GROUND SOLAR FARM (north of building — large array) ───────────
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 8; col++) {
+                const pg = new THREE.Group();
+                pg.position.set(bldCX - 84 + col * 24, 0, bBackZ - 30 - row * 18);
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 2.5), metalStructureMat2);
+                pole.position.y = 1.25; pg.add(pole);
+                const frame = new THREE.Mesh(new THREE.BoxGeometry(20, 0.15, 8), metalStructureMat2);
+                frame.position.y = 2.5; frame.rotation.x = 0.42; pg.add(frame);
+                const pv = new THREE.Mesh(new THREE.BoxGeometry(19.5, 0.09, 7.6), solarMat);
+                pv.position.set(0, 2.55, 0); pv.rotation.x = 0.42; pg.add(pv);
+                scene.add(pg);
+            }
+        }
+        // ─── PARKING LOT (left side — blueprint PARKOLÓHELYEK) ─────────────
+        const carColors2 = [0xc0392b, 0x1a5276, 0x145a32, 0x4a235a, 0x784212, 0x1b2631, 0x922b21, 0x117a65];
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 10; col++) {
+                const cx2 = -95 - row * 6, cz2 = -80 + col * 16;
+                const cm = new THREE.MeshStandardMaterial({ color: carColors2[(row*10+col)%8], roughness: 0.3, metalness: 0.5 });
+                const body = new THREE.Mesh(new THREE.BoxGeometry(2, 1.2, 4.2), cm);
+                body.position.set(cx2, 0.7, cz2); body.castShadow = true; scene.add(body);
+                const roofC = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 2.2), cm);
+                roofC.position.set(cx2, 1.65, cz2); scene.add(roofC);
+            }
+        }
+        const wlineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        for (let i = 0; i < 11; i++) {
+            const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 30), wlineMat);
+            pl.rotation.x = -Math.PI/2; pl.position.set(-80 - i*6, 0.04, -50); scene.add(pl);
+        }
+        // ─── SECONDARY BUILDING (right — MELLÉKÉPÜLET) ─────────────────────
+        const auxM = new THREE.MeshStandardMaterial({ color: 0xd0c6b8, roughness: 0.8 });
+        const auxBod = new THREE.Mesh(new THREE.BoxGeometry(40, 8, 45), auxM);
+        auxBod.position.set(135, 4, -5); auxBod.castShadow = true; scene.add(auxBod);
+        const auxRf = new THREE.Mesh(new THREE.PlaneGeometry(41, 46), roofMat);
+        auxRf.rotation.x = -Math.PI/2; auxRf.position.set(135, 8.01, -5); scene.add(auxRf);
+        const auxPar = new THREE.Mesh(new THREE.BoxGeometry(41, 1, 46), concreteMat);
+        auxPar.position.set(135, 8.5, -5); scene.add(auxPar);
+        for (let i = 0; i < 4; i++) { addWindow(116 + i*9, 4.5, -27.1, 4, 2, 0); }
+        // Solar on aux roof
+        for (let col = 0; col < 3; col++) {
+            const pg = new THREE.Group(); pg.position.set(120 + col * 12, 8.25, -5);
+            const pv = new THREE.Mesh(new THREE.BoxGeometry(10, 0.08, 8), solarMat);
+            pv.rotation.x = 0.18; pg.add(pv); scene.add(pg);
+        }
+
+
+
+
+
+
+        // 8. Interior — matches blueprint layout exactly
+        // Warehouse wing: X=-60..20, Z=-30..40  (whCX=-20, whW=80)
+        // Office wing:    X=20..80, Z=-30..40   (offCX=50, offW=60)
+
+        const smtTex = createSMTTexture();
+        const smtMat = new THREE.MeshStandardMaterial({ map: smtTex, roughness: 0.3 });
+        const conveyors = [];
+
+        // ── SMT Production Lines inside WAREHOUSE (Left side, X: -55..-5) ────────────
+        // 3 parallel lines running left-right (X axis)
+        for (let line = 0; line < 3; line++) {
+            const zLine = -6 + line * 6; // Z: -6, 0, +6
+
+            // Conveyor rail
+            const rail = new THREE.Mesh(new THREE.BoxGeometry(45, 0.6, 1.0), metalStructureMat);
+            rail.position.set(-30, 0.7, zLine);
+            rail.receiveShadow = true;
+            scene.add(rail);
+            conveyors.push(rail);
+
+            // 5 SMT units per line
+            for (let i = 0; i < 5; i++) {
+                const xUnit = -50 + i * 9;
+                const unit = new THREE.Mesh(new THREE.BoxGeometry(5.5, 4.0, 3.0), smtMat);
+                unit.position.set(xUnit, 2.0, zLine);
+                unit.castShadow = true;
+                scene.add(unit);
+
+                // Stacklight
+                const slPole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.5), metalStructureMat);
+                slPole.position.set(xUnit + 2.5, 4.5, zLine - 1.5);
+                scene.add(slPole);
+                const slColor = (line === 1 && i === 2) ? 0xef4444 : 0x10b981;
+                const sl = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.4), new THREE.MeshBasicMaterial({ color: slColor }));
+                sl.position.set(xUnit + 2.5, 5.3, zLine - 1.5);
+                scene.add(sl);
+            }
+
+            // Robot arm at end of each line
+            const robotBase = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.2), metalStructureMat);
+            robotBase.position.set(-6, 1.5, zLine);
+            scene.add(robotBase);
+            const armGroup = new THREE.Group();
+            armGroup.position.set(-6, 2.1, zLine);
+            const lo = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2, 0.3), metalStructureMat);
+            lo.position.y = 1; armGroup.add(lo);
+            const hi = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.8, 0.2), metalStructureMat);
+            hi.position.set(0, 2.5, 0.5); hi.rotation.x = 0.5; armGroup.add(hi);
+            scene.add(armGroup);
+            conveyors.push(armGroup);
+        }
+
+        // ── Storage Racks — BOM Zone (Center-Left, X: -2..12) ─────────
+        const boxColors = [0x1d4ed8, 0xd97706, 0x059669, 0xdc2626];
+        for (let row = 0; row < 3; row++) {
+            const xRack = -2 + row * 6;
+            for (let shelf = 0; shelf < 3; shelf++) {
+                const yShelf = 1.5 + shelf * 2.8;
+                for (let box = 0; box < 3; box++) {
+                    const zBox = -6 + box * 6;
+                    const cm = new THREE.MeshStandardMaterial({ color: boxColors[(row+shelf+box)%4], roughness: 0.4 });
+                    const c = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.4, 2.2), cm);
+                    c.position.set(xRack, yShelf, zBox);
+                    c.castShadow = true;
+                    scene.add(c);
+                }
+            }
+            // Rack uprights
+            const upright = new THREE.Mesh(new THREE.BoxGeometry(0.15, 9, 0.15), metalStructureMat);
+            [-7, -1, 5, 8].forEach(z => { const u = upright.clone(); u.position.set(xRack, 4.5, z); scene.add(u); });
+        }
+
+        // ── Office furniture inside OFFICE wing (Right side, X: 16..55) ──────────────────
+        const deskMat = new THREE.MeshStandardMaterial({ color: 0xdde1e7, roughness: 0.6 });
+        const screenMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
+        for (let row = 0; row < 2; row++) {
+            for (let col = 0; col < 4; col++) {
+                const dx = 20 + col * 10;
+                const dz = -5 + row * 10;
+                const desk = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.1, 2.5), deskMat);
+                desk.position.set(dx, 1.2, dz); desk.castShadow = true; scene.add(desk);
+                const leg = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.2, 2.2), metalStructureMat);
+                leg.position.set(dx-2, 0.6, dz); scene.add(leg);
+                const leg2 = leg.clone(); leg2.position.set(dx+2, 0.6, dz); scene.add(leg2);
+                
+                const screen = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.8, 0.1), screenMat);
+                screen.position.set(dx-1, 1.8, dz-0.5); scene.add(screen);
+                const screen2 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.8, 0.1), screenMat);
+                screen2.position.set(dx+1, 1.8, dz-0.5); scene.add(screen2);
+            }
+        }
+
+        // ── Parking lot (left of building, blueprint shows parkolóhelyek) ─────
+        const carColors = [0xc0392b, 0x1a5276, 0x145a32, 0x4a235a, 0x784212, 0x1b2631];
+        const carBodyMat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.3, metalness: 0.5 });
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 8; col++) {
+                const cx2 = -90 - row * 6;
+                const cz2 = -55 + col * 14;
+                const body = new THREE.Mesh(new THREE.BoxGeometry(2, 1.2, 4.2), carBodyMat(carColors[(row*8+col)%6]));
+                body.position.set(cx2, 0.7, cz2); body.castShadow = true; scene.add(body);
+                const roof = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 2.2), carBodyMat(carColors[(row*8+col)%6]));
+                roof.position.set(cx2, 1.65, cz2); scene.add(roof);
+            }
+        }
+        // Parking lot markings (white lines on asphalt)
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        for (let i = 0; i < 9; i++) {
+            const pLine = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 25), lineMat);
+            pLine.rotation.x = -Math.PI/2; pLine.position.set(-78 - i*6, 0.05, -40);
+            scene.add(pLine);
+        }
+
+        // ── Secondary building (melléképület) — right side, from aerial ───────
+        const auxBeige = new THREE.MeshStandardMaterial({ color: 0xd5c9b8, roughness: 0.8 });
+        const auxBody = new THREE.Mesh(new THREE.BoxGeometry(35, 8, 40), auxBeige);
+        auxBody.position.set(130, 4, -15); auxBody.castShadow = true; scene.add(auxBody);
+        const auxRoof = new THREE.Mesh(new THREE.PlaneGeometry(36, 41), roofMat);
+        auxRoof.rotation.x = -Math.PI/2; auxRoof.position.set(130, 8.01, -15); scene.add(auxRoof);
+        const auxParapet = new THREE.Mesh(new THREE.BoxGeometry(36, 1, 41), concreteMat);
+        auxParapet.position.set(130, 8.5, -15); scene.add(auxParapet);
+        // Windows on aux building front
+        for (let i = 0; i < 4; i++) {
+            const aw = new THREE.Mesh(new THREE.BoxGeometry(3.5, 1.8, 0.2), winGlassMat);
+            aw.position.set(115 + i*8, 4.5, -35.1); scene.add(aw);
+        }
+
+        // 9. Lighting
+        const hemiLight = new THREE.HemisphereLight(0xc8dff8, 0x6b7280, 1.0);
+        scene.add(hemiLight);
+
+        const sun = new THREE.DirectionalLight(0xfffdf4, 1.8);
+        sun.position.set(80, 180, 80);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048;
+        sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 700;
+        const d = 200;
+        sun.shadow.camera.left = -d; sun.shadow.camera.right = d;
+        sun.shadow.camera.top = d; sun.shadow.camera.bottom = -d;
+        sun.shadow.bias = -0.0005;
+        scene.add(sun);
+
+        // Interior LED high-bays (ceiling at Y=8.5) inside the main building bounds
+        for (let x = -55; x <= 55; x += 15) {
+            for (let z = -8; z <= 8; z += 8) {
+                const g = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                g.position.set(x, 8.5, z); scene.add(g);
+                const pl = new THREE.PointLight(0xfff8e7, 2.5, 25, 0.6);
+                pl.position.set(x, 8.0, z); scene.add(pl);
+            }
+        }
+
+        // 10. Boundaries & Walking Physics
+        // Spawn right in front of the central glass lobby entrance (X=0, Z=15)
+        camera.position.set(0, 2, 15);
+        camera.rotation.y = Math.PI; // Face the building
         prevPosition.copy(camera.position);
 
         const clock = new THREE.Clock();
 
+        function checkCollision(pos) {
+            if (pos.x < -280 || pos.x > 280 || pos.z < -280 || pos.z > 280) return true;
+
+            // Single continuous building bounds
+            const inMainBldg = (pos.x > -59 && pos.x < 59 && pos.z > -10.5 && pos.z < 10.5);
+            // Glass Lobby bounds (extends outward centrally)
+            const inLobby = (pos.x > -4 && pos.x < 4 && pos.z >= 10.5 && pos.z < 14);
+
+            const wasInMainBldg = (camera.position.x > -59 && camera.position.x < 59 && camera.position.z > -10.5 && camera.position.z < 10.5);
+            const wasInLobby = (camera.position.x > -4 && camera.position.x < 4 && camera.position.z >= 10.5 && camera.position.z < 14);
+
+            // Block walking out through solid walls (must go through lobby)
+            if (inMainBldg && !wasInMainBldg && !inLobby) return true;
+            if (!inMainBldg && wasInMainBldg && !inLobby) return true;
+
+            // Block walking sideways through solid lobby glass walls
+            if (inLobby && !wasInLobby && (pos.x < -3.8 || pos.x > 3.8)) return true;
+
+            // Aux building blocking
+            if (pos.x > 112 && pos.x < 148 && pos.z > -36 && pos.z < 6) return true;
+
+            return false;
+        }
+
+        // Minimap Render Logic
+        const minimapCanvas = document.getElementById('minimap-canvas');
+        const minimapCtx = minimapCanvas.getContext('2d');
+        minimapCanvas.width = 180;
+        minimapCanvas.height = 180;
+
+        function updateMinimap() {
+            minimapCtx.fillStyle = '#0f172a';
+            minimapCtx.fillRect(0, 0, 180, 180);
+
+            // Draw relative coordinates
+            minimapCtx.fillStyle = 'rgba(59, 130, 246, 0.15)';
+            minimapCtx.fillRect(90 - 40, 90 - 28, 80, 56);
+            
+            minimapCtx.strokeStyle = '#3b82f6';
+            minimapCtx.lineWidth = 2;
+            minimapCtx.strokeRect(90 - 40, 90 - 28, 80, 56);
+
+            // Draw player in center
+            minimapCtx.fillStyle = '#ef4444';
+            minimapCtx.beginPath();
+            minimapCtx.arc(90, 90, 5, 0, Math.PI*2);
+            minimapCtx.fill();
+
+            // Draw compass direction indicator
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            minimapCtx.strokeStyle = '#ef4444';
+            minimapCtx.lineWidth = 3;
+            minimapCtx.beginPath();
+            minimapCtx.moveTo(90, 90);
+            minimapCtx.lineTo(90 + dir.x * 16, 90 + dir.z * 16);
+            minimapCtx.stroke();
+        }
+
+        // 11. Main Render Loop
         function animate() {
             requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+
             if (controls.isLocked) {
-                const delta = clock.getDelta();
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
+                velocity.x -= velocity.x * 8.0 * delta;
+                velocity.z -= velocity.z * 8.0 * delta;
+                
                 direction.z = Number(moveForward) - Number(moveBackward);
                 direction.x = Number(moveRight) - Number(moveLeft);
                 direction.normalize();
 
-                const speed = isRunning ? 400.0 : 200.0;
+                const speed = isRunning ? 280.0 : 130.0;
                 if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
                 if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
 
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
+                const stepX = -velocity.x * delta;
+                const stepZ = -velocity.z * delta;
+
+                const nextPos = camera.position.clone();
+                nextPos.x += stepX;
+                if (!checkCollision(nextPos)) {
+                    controls.moveRight(stepX);
+                } else {
+                    velocity.x = 0;
+                }
+
+                nextPos.copy(camera.position);
+                nextPos.z += stepZ;
+                if (!checkCollision(nextPos)) {
+                    controls.moveForward(stepZ);
+                } else {
+                    velocity.z = 0;
+                }
+
+                camera.position.y = 2.0;
 
                 const dist = camera.position.distanceTo(prevPosition);
                 if(dist > 0.01) {
                     totalDistance += dist;
-                    document.getElementById('distance').innerText = (totalDistance / 2.5).toFixed(1);
+                    document.getElementById('distance').innerText = (totalDistance).toFixed(1);
                     prevPosition.copy(camera.position);
                 }
+
+                let currentZone = "Udvar";
+                const cx = camera.position.x;
+                const cz = camera.position.z;
+
+                if (cx > -60 && cx < 60 && cz > -11 && cz < 11) {
+                    if (cx < -10) currentZone = "SMT Gyártócsarnok";
+                    else if (cx >= -10 && cx < 10) currentZone = "Raktár / BOM Zóna";
+                    else if (cx >= 10 && cx < 30) currentZone = "Tárgyaló & Recepció";
+                    else currentZone = "Mérnöki Irodák";
+                } else if (cx > -4 && cx < 4 && cz > 10 && cz < 14) {
+                    currentZone = "Főbejárat / Atrium";
+                } else if (cx > -100 && cx < -60 && cz > -80 && cz < 0) {
+                    currentZone = "Parkoló";
+                } else if (cx > 112 && cx < 155 && cz > -28 && cz < 18) {
+                    currentZone = "Melléképület";
+                }
+                document.getElementById('location').innerText = currentZone;
             }
+
+            // Animate mechanical robot arms
+            const elapsed = clock.getElapsedTime();
+            for(let i=1; i<conveyors.length; i+=2) {
+                const arm = conveyors[i];
+                if(arm) {
+                    arm.rotation.y = Math.sin(elapsed * 2) * 0.3;
+                    arm.children[1].rotation.z = Math.cos(elapsed * 4) * 0.2;
+                }
+            }
+
+            updateMinimap();
             renderer.render(scene, camera);
         }
         animate();
@@ -201,5 +866,4 @@
     <script src="../../js/header.js"></script>
     <script src="../../js/main.js"></script>
 </body>
-
 </html>

@@ -1,57 +1,315 @@
 <!DOCTYPE html>
-<html lang="hu" data-theme="dark">
+<html lang="hu" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nagyatád Okoshálózat - ELEC</title>
+    <title>Nagyatád Okoshálózat Fejlesztés - Somogy Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/main.css">
+    <style>
+        :root {
+            --obsidian: #0a0a0f;
+            --amber: #d4a853;
+            --mist-white: #f0ede8;
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Raleway', sans-serif;
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--obsidian);
+            color: var(--mist-white);
+            line-height: 1.8;
+            padding: 6rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Ambient Grain Overlay */
+        .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 5rem;
+            border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+            padding-bottom: 3rem;
+            text-align: center;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: var(--mist-white);
+            margin-bottom: 2rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            margin: 0 0 2rem 0;
+            line-height: 1.2;
+            color: var(--amber);
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 400;
+            margin: 4rem 0 2rem 0;
+            color: var(--amber);
+        }
+
+        p {
+            margin: 0 0 2rem 0;
+            font-weight: 300;
+            text-align: justify;
+        }
+
+        .formula {
+            display: flex;
+            justify-content: center;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 168, 83, 0.1);
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        ul {
+            margin: 0 0 2rem 0;
+            padding-left: 1.5rem;
+            list-style: none;
+        }
+
+        li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--amber);
+        }
+
+        .summary {
+            margin-top: 6rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(212, 168, 83, 0.2);
+        }
+
+        strong {
+            color: var(--amber);
+            font-weight: 600;
+        }
+
+        /* Reveals */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s var(--transition-smooth), transform 1.2s var(--transition-smooth);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 4rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
-<body class="module-body">
-    <!-- Unified Header injected by header.js -->
+<body>
+<!-- header injected by js/header.js -->
 
-    <div class="module-container">
-        <div class="module-content-wrapper">
-            <h1>Nagyatád Okoshálózat-fejlesztés Analízis</h1>
-            <p>Esettanulmány: Nagyatád 120/22 kV-os hálózatának adaptív okoshálózat-fejlesztése és feszültségstabilitási analízise magas HMKE penetráció mellett.</p>
 
-            <h2>1. A hálózati topológia és az alapállapot definíciója</h2>
-            <p>Nagyatád és vonzáskörzete ellátását a regionális átviteli hálózatról (MAVIR 120 kV) egy 120/22 kV-os transzformátorállomás biztosítja. A várost egy 22 kV-os középfeszültségű (KÖF) elosztóhálózat fedi le, amely sugaras és hurkolt struktúrákból áll.</p>
+    <div class="grain-overlay"></div>
 
-            <h2>2. A Mérnöki Probléma: A "Duck Curve" (Kacsagörbe)</h2>
-            <p>A lakossági napelemes rendszerek (HMKE) terjedése miatt nyáron, kora délután a termelt teljesítmény jelentősen meghaladja a városi fogyasztást.</p>
-            <p>A feszültségemelkedés (\(\Delta U\)) leírása:</p>
-            <div style="background: var(--bg-hover); padding: 1rem; margin: 1rem 0; border-radius: 8px; text-align: center;">
-                \[\Delta U \approx \frac{P \cdot R + Q \cdot X}{U_n}\]
+    <div class="container">
+        <header class="reveal">
+            <p class="intro-text">
+                Elemzésünkben egy komplex villamosmérnöki esettanulmányt nézünk meg, amely a legkorszerűbb
+                hálózatszámítási, teljesítményelektronikai és okoshálózati (smart grid) elméleteket integrálja
+                <strong>Nagyatád villamosenergia-ellátásának modernizációjába.</strong>
+            </p>
+            <p class="intro-text">
+                Feszegessük a határokat, és nézzük meg, hogyan modelleznénk és oldanánk meg a város jövőbeli energetikai
+                kihívásait egy mérnöki tervezőasztalon.
+            </p>
+        </header>
+
+        <main>
+            <h1 class="reveal">Esettanulmány: Nagyatád 120/22 kV-os hálózatának adaptív okoshálózat-fejlesztése és
+                feszültségstabilitási analízise magas HMKE penetráció mellett</h1>
+
+            <section class="reveal">
+                <h2>1. A hálózati topológia és az alapállapot definíciója</h2>
+                <p>
+                    Nagyatád és vonzáskörzete ellátását a regionális átviteli hálózatról (MAVIR 120 kV) egy 120/22 kV-os
+                    transzformátorállomás biztosítja (Dél-dunántúli E.ON hálózat). A várost egy 22 kV-os
+                    középfeszültségű (KÖF) elosztóhálózat fedi le, amely sugaras és hurkolt, de sugarasan üzemeltetett
+                    struktúrákból áll. A 22/0.4 kV-os KÖF/KIF (kisfeszültségű) transzformátorok látják el a lakosságot,
+                    a Nagyatádi Kórházat, a Termálfürdőt és a helyi ipari parkot.
+                </p>
+            </section>
+
+            <section class="reveal">
+                <h2>2. A Mérnöki Probléma: A "Duck Curve" (Kacsagörbe) és a visszirányú teljesítményáramlás</h2>
+                <p>
+                    A lakossági napelemes rendszerek (HMKE - Háztartási Méretű Kiserőművek) és a városhoz közeli nagyobb
+                    naperőműparkok robbanásszerű terjedése miatt miatt nyáron, kora délután a termelt teljesítmény
+                    (\(P_{termelt}\)) jelentősen meghaladja a városi fogyasztást (\(P_{fogyasztott}\)).
+                </p>
+                <p>
+                    A kisfeszültségű sugaras hálózatok végpontjain a feszültségemelkedés (\(\Delta U\)) az alábbi
+                    közelítő képlettel írható le:
+                </p>
+                <div class="formula">
+                    \[\Delta U \approx \frac{P \cdot R + Q \cdot X}{U_n}\]
+                </div>
+                <p>
+                    Ahol \(P\) a visszatáplált hatásos teljesítmény, \(R\) a vezeték ellenállása, \(Q\) a meddő
+                    teljesítmény, \(X\) a reaktancia, \(U_n\) a névleges feszültség. Mivel a KIF hálózatok \(R/X\)
+                    aránya magas (ohmikus jellegűek), a betáplált \(P\) drasztikusan megemeli a feszültséget. Ha a
+                    feszültség eléri a 253 V-ot (230 V + 10%), a napelemes inverterek túlfeszültség-védeleme lekapcsol,
+                    ami hálózati lengésekhez (oszcillációhoz) vezet. Ugyanakkor az esti órákban (naplemente után) a
+                    terhelés hirtelen megnő, és feszültségesés lép fel.
+                </p>
+            </section>
+
+            <section class="reveal">
+                <h2>3. Megoldás I: Dinamikus Load-Flow (Terhelésáramlás) Analízis</h2>
+                <p>
+                    A feszültségprofil stabilizálásához a hálózatot nem-lineáris algebrai egyenletrendszerként
+                    modellezzük (Newton-Raphson vagy Fast Decoupled módszerrel).
+                    Felírjuk a csomóponti teljesítményegyenleteket egy tetszőleges \(i\)-edik csomópontra:
+                </p>
+                <div class="formula">
+                    \[P_i = |U_i| \sum_{j=1}^N |U_j| |Y_{ij}| \cos(\theta_{ij} - \delta_i + \delta_j)\]
+                </div>
+                <div class="formula">
+                    \[Q_i = -|U_i| \sum_{j=1}^N |U_j| |Y_{ij}| \sin(\theta_{ij} - \delta_i + \delta_j)\]
+                </div>
+                <p>
+                    (Ahol \(Y_{ij}\) az admittancia mátrix elemei, \(\delta\) a feszültség fázisszöge).
+                </p>
+                <p>
+                    A számítások alapján Nagyatád 120/22 kV-os alállomásán a hagyományos fokozatkapcsolós (OLTC -
+                    On-Load Tap Changer) transzformátor lassan reagál. Mérnöki javaslatunk: egy <strong>STATCOM (Static
+                        Synchronous Compensator)</strong> telepítése a 22 kV-os gyűjtősínre. A STATCOM
+                    fázisszögszabályozott IGBT-k (Insulated Gate Bipolar Transistor) segítségével ezredmásodpercek alatt
+                    képes induktív vagy kapacitív meddőteljesítményt (\(Q\)) injektálni, így dinamikusan szabályozza a
+                    feszültséget, stabilan tartva azt a hálózat teljes hosszán.
+                </p>
+            </section>
+
+            <section class="reveal">
+                <h2>4. Megoldás II: Zárlati viszonyok és Adaptív Védelmi Koordináció (IEC 60909)</h2>
+                <p>
+                    A hagyományos hálózatban az energia egy irányba áramlott (az alállomástól a fogyasztóig). A
+                    betápláló inverterek és a tervezett energiatárolók miatt azonban kétirányú áramlás alakul ki. Egy 22
+                    kV-os vonali zárlat esetén a megszokott túláramvédelmek (ANSI 50/51) "vakfoltba" kerülhetnek
+                    (sympathetic tripping).
+                    Számítanunk kell a kezdeti szimmetrikus zárlati áramot (\(I''_k\)), ami kiegészül az inverterek
+                    zárlati hozzájárulásával (bár ez a névleges áramuk max. 1.2-1.5-szöröse, mégis befolyásolja a
+                    védelmi szelektivitást).
+                    <strong>Beavatkozás:</strong> A nagyatádi elosztóhálózat betáplálási pontjain <strong>irányérzékeny
+                        túláramvédelmet (ANSI 67)</strong> és távolsági védelmeket (ANSI 21) kell alkalmazni, melyek a
+                    feszültség és az áram fázishelyzetéből (impedanciavektor irányából) megállapítják, hogy a zárlat az
+                    alállomás vagy a fogyasztók (pl. egy nagyobb napelempark) felől van-e.
+                </p>
+            </section>
+
+            <section class="reveal">
+                <h2>5. Megoldás III: BESS (Battery Energy Storage System) és Szigetüzem (Microgrid) a Kritikus
+                    Infrastruktúrának</h2>
+                <p>
+                    A rendszer koronája egy központi, 5 MW / 10 MWh kapacitású Lítium-vasfoszfát (LiFePO4) hálózati
+                    energiatároló integrálása a nagyatádi csomópontba.
+                </p>
+                <ul>
+                    <li><strong>Peak-shaving (Csúcslevágás):</strong> A rendszer a nappali túltermelést eltárolja, majd
+                        az esti csúcsfogyasztáskor kisüti, tehermentesítve a 120/22 kV-os transzformátort.</li>
+                    <li><strong>Szigetüzem (Islanding):</strong> Egy országos black-out (áramszünet) esetén a rendszer
+                        képes a hálózatot leválasztani. Egy fáziszárt hurok (PLL - Phase-Locked Loop) vezérlésű
+                        <i>Grid-Forming Inverter</i> segítségével a nagyatádi hálózat szigetüzembe áll át. A kórház és a
+                        vízmű (kritikus fogyasztók) megszakítás nélkül (UPS funkció) kapják tovább az áramot a tárolóból
+                        és a helyi naperőművekből.</li>
+                </ul>
+            </section>
+
+            <div class="summary reveal">
+                <h2>Összegzés:</h2>
+                <p>
+                    Egy ilyen koncepció tervezésekor a feszültségvektoroktól és az egyensúlyi differenciálegyenletektől
+                    kezdve a jelfeldolgozáson (PLL algoritmusok) át a nagy teljesítményű félvezetők hűtéséig mindent
+                    figyelembe kell venni. A nagyatádi hálózat okosítása nemcsak vastagabb kábelek kihúzását jelenti,
+                    hanem a hálózat digitális "idegrendszerének" (SCADA rendszer, okos mérők, aktív beavatkozók)
+                    felépítését.
+                </p>
             </div>
-
-            <h2>3. Megoldás I: Dinamikus Load-Flow Analízis</h2>
-            <p>A feszültségprofil stabilizálásához a hálózatot nem-lineáris algebrai egyenletrendszerként modellezzük.</p>
-            <div style="background: var(--bg-hover); padding: 1rem; margin: 1rem 0; border-radius: 8px; text-align: center;">
-                \[P_i = |U_i| \sum_{j=1}^N |U_j| |Y_{ij}| \cos(\theta_{ij} - \delta_i + \delta_j)\]
-            </div>
-
-            <h2>4. Megoldás II: Zárlati viszonyok és Adaptív Védelem</h2>
-            <p>A betápláló inverterek és energiatárolók miatt kétirányú áramlás alakul ki. Számítanunk kell a kezdeti szimmetrikus zárlati áramot (\(I''_k\)). Beavatkozás: irányérzékeny túláramvédelmet (ANSI 67) és távolsági védelmeket (ANSI 21) kell alkalmazni.</p>
-
-            <h2>5. Megoldás III: BESS (Battery Energy Storage System)</h2>
-            <p>Egy központi, 5 MW / 10 MWh kapacitású LiFePO4 hálózati energiatároló integrálása a nagyatádi csomópontba.</p>
-            <ul>
-                <li><strong>Peak-shaving</strong>: A nappali túltermelés eltárolása és esti kisütése.</li>
-                <li><strong>Szigetüzem (Islanding)</strong>: Black-out esetén a kritikus fogyasztók (kórház, vízmű) ellátása a tárolóból.</li>
-            </ul>
-
-            <h2>Összegzés</h2>
-            <p>A nagyatádi hálózat okosítása a hálózat digitális "idegrendszerének" (SCADA rendszer, okos mérők, aktív beavatkozók) felépítését jelenti a feszültségvektorok és egyensúlyi differenciálegyenletek mentén.</p>
-        </div>
+        </main>
     </div>
 
+    <script src="../js/main.js"></script>
+    <script>
+        // Intersection Observer for reveals
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
     <script src="../js/header.js"></script>
     <script src="../js/main.js"></script>
 </body>

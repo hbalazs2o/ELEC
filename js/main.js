@@ -6,8 +6,8 @@ const App = {
     state: {
         user: null,
         theme: localStorage.getItem('theme') || 'dark',
-        location: { lat: 46.229, lon: 17.365 },
-        version: 'V4.0',
+        location: { lat: 46.745, lon: 17.558 },
+        version: 'V5.0',
         powerAlert: false
     },
 
@@ -29,13 +29,22 @@ const App = {
 
     applyTheme() {
         document.documentElement.setAttribute('data-theme', this.state.theme);
+        this.syncThemeIcon();
     },
 
     toggleTheme() {
         this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
         localStorage.setItem('theme', this.state.theme);
         this.applyTheme();
-        this.injectGlobalNav(); // Refresh icons
+        this.syncThemeIcon();
+    },
+
+    syncThemeIcon() {
+        const icon = document.getElementById('theme-toggle-icon');
+        if (icon) {
+            icon.className = this.state.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        if (typeof UI !== 'undefined') UI.syncThemeIcon();
     },
 
     initClock() {

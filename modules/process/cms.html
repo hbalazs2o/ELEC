@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="hu" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELEC - CMS Media</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'><path fill='%233b82f6' d='M420.55,301.93a24,24,0,1,1,24-24,24,24,0,0,1-24,24m-265.1,0a24,24,0,1,1,24-24,24,24,0,0,1-24,24m273.7,70.59a12,12,0,0,1,0,24H147.15a12,12,0,0,1,0-24ZM532,224H480V128a128,128,0,0,0-256,0v96H172a52,52,0,0,0-52,52V460a52,52,0,0,0,52,52H404a52,52,0,0,0,52-52V276a52,52,0,0,0-52-52ZM272,128a80,80,0,0,1,160,0v32H272Zm132,332H172a20,20,0,0,1-20-20V276a20,20,0,0,1,20-20H404a20,20,0,0,1,20,20V440a20,20,0,0,1-20,20M96,192V112a16,16,0,0,0-32,0v80a16,16,0,0,0,32,0m448,0V112a16,16,0,0,0-32,0v80a16,16,0,0,0,32,0'/></svg>">
+
+    <style>
+        .cms-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 2; /* Above ambient glows */
+        }
+        
+        .cms-header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .cms-header h1 {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            margin-bottom: 1rem;
+            letter-spacing: -0.05rem;
+        }
+
+        .cms-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin: 3rem 0 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* MASONRY GRID FOR IMAGES */
+        .masonry-grid {
+            column-count: 3;
+            column-gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) { .masonry-grid { column-count: 2; } }
+        @media (max-width: 640px) { .masonry-grid { column-count: 1; } }
+
+        .media-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .media-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        .media-card img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .media-info {
+            padding: 1rem;
+        }
+
+        .media-info h4 {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            word-break: break-all;
+            font-family: var(--font-mono);
+        }
+
+        .media-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* DOCUMENT CARDS */
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .doc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .doc-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .doc-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .doc-card[href$=".pdf"] .doc-icon { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .doc-card[href$=".pptx"] .doc-icon { color: #f97316; background: rgba(249, 115, 22, 0.1); }
+
+        .doc-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+            word-break: break-all;
+        }
+        
+        .doc-details p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Image Modal */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        #lightbox.active {
+            display: flex;
+        }
+        .close-lightbox {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: color 0.3s;
+        }
+        .close-lightbox:hover { color: var(--primary); }
+
+    </style>
+</head>
+<body class="authenticated">
+
+    <!-- Header injected by header.js -->
+
+    <div class="cms-container fade-in">
+        
+        <div class="cms-header">
+            <h1>CMS Media Center</h1>
+            <p>A központi média- és dokumentumtár az ELEC Factory projekthez. Itt találhatók a 3D modellek látványtervei, prezentációk és kézikönyvek.</p>
+        </div>
+
+        <!-- 3D MODELL KÉPEK -->
+        <h2 class="section-title"><i class="fas fa-cube"></i> 3D Építészeti Modellek (CMS/MODELL)</h2>
+        <div class="masonry-grid">
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_9o8zd29o8zd29o8z.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_9o8zd29o8zd29o8z.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_9o...</h4>
+                    <p>Melléképület / Parkoló layout</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_fo7600fo7600fo76.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_fo7600fo7600fo76.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_fo...</h4>
+                    <p>Főépület és Napelem park</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_ljqfv0ljqfv0ljqf.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_ljqfv0ljqfv0ljqf.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_lj...</h4>
+                    <p>Éjszakai kivilágítás design</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_nrvfwhnrvfwhnrvf.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_nrvfwhnrvfwhnrvf.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_nr...</h4>
+                    <p>CMS Factory Blueprint Style</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_pwxi6epwxi6epwxi.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_pwxi6epwxi6epwxi.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_pw...</h4>
+                    <p>Üzemcsarnok belső koncepció</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_rqglofrqglofrqgl.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_rqglofrqglofrqgl.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_rq...</h4>
+                    <p>Északi homlokzat (North Elevation)</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/MODELL/Gemini_Generated_Image_y2xfi8y2xfi8y2xf.png')">
+                <img src="../../CMS/MODELL/Gemini_Generated_Image_y2xfi8y2xfi8y2xf.png" alt="3D Modell Látványterv">
+                <div class="media-info">
+                    <h4>Gemini_Generated_Image_y2...</h4>
+                    <p>Madártávlati nézet (Aerial)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTEBOOK KÉPEK -->
+        <h2 class="section-title"><i class="fas fa-camera"></i> Screenshotok (CMS/NOTEBOOK)</h2>
+        <div class="masonry-grid">
+            <div class="media-card" onclick="openLightbox('../../CMS/NOTEBOOK/unnamed.png')">
+                <img src="../../CMS/NOTEBOOK/unnamed.png" alt="Screenshot 1">
+                <div class="media-info">
+                    <h4>unnamed.png</h4>
+                    <p>Rendszer képernyőkép</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/NOTEBOOK/unnamed (1).png')">
+                <img src="../../CMS/NOTEBOOK/unnamed (1).png" alt="Screenshot 2">
+                <div class="media-info">
+                    <h4>unnamed (1).png</h4>
+                    <p>Rendszer képernyőkép</p>
+                </div>
+            </div>
+            <div class="media-card" onclick="openLightbox('../../CMS/NOTEBOOK/unnamed (2).png')">
+                <img src="../../CMS/NOTEBOOK/unnamed (2).png" alt="Screenshot 3">
+                <div class="media-info">
+                    <h4>unnamed (2).png</h4>
+                    <p>Rendszer képernyőkép</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOKUMENTUMOK (Beágyazott Prezentáció) -->
+        <h2 class="section-title"><i class="fas fa-desktop"></i> CMS Strategic Blueprint (Prezentáció)</h2>
+        <div class="doc-viewer-container" style="position: relative; width: 100%; height: 800px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem;">
+            <iframe 
+                src="../../CMS/NOTEBOOK/CMS_Electronics_Strategic_Blueprint.pdf#toolbar=0&navpanes=0&scrollbar=0" 
+                style="width: 100%; height: 100%; border: none;" 
+                title="CMS Strategic Blueprint">
+            </iframe>
+        </div>
+
+    </div>
+
+    <!-- Lightbox for Images -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <button class="close-lightbox"><i class="fas fa-times"></i></button>
+        <img id="lightbox-img" src="" alt="Full Screen Image">
+    </div>
+
+    <script src="../../js/header.js"></script>
+    <script src="../../js/main.js"></script>
+    <script>
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
