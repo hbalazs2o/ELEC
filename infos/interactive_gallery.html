@@ -195,14 +195,116 @@
             line-height: 1.6;
         }
 
+        /* Interactive Multi-Frame Viewer Section (New Feature) */
+        .interactive-frames-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .frame-viewer-container {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 24px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 50px;
+            align-items: center;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+        }
+
+        @media (max-width: 968px) {
+            .frame-viewer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .frame-display-window {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .frame-display-window img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .frame-display-window img.active {
+            display: block;
+        }
+
+        .frame-indicator-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .frame-indicator-progress {
+            height: 100%;
+            width: 10%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
+            transition: width 0.1s ease;
+        }
+
+        .frame-details-panel h3 {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .frame-details-panel p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .frame-scrubber-hud {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+        }
+
+        .scrubber-hud-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .scrubber-hud-row span:last-child {
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
         /* Auto-play Embedded Gallery Section */
         .gallery-section {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 100px 40px;
+            padding: 80px 40px 100px;
             display: flex;
             flex-direction: column;
-            gap: 100px;
+            gap: 80px;
             position: relative;
             z-index: 10;
         }
@@ -369,6 +471,38 @@
         </div>
     </div>
 
+    <!-- Frame-Scrubbing Interactive Multi-frame Window -->
+    <div class="interactive-frames-section" id="frame-section">
+        <div class="frame-viewer-container">
+            <div class="frame-display-window" id="frameWindow">
+                <!-- 10 consecutive frames extracted from the actual video loop -->
+                <img src="1778824803867.gif" class="active" id="frame-img" alt="Exhibition frame interactive">
+                <div class="frame-indicator-bar">
+                    <div class="frame-indicator-progress" id="frameProgress"></div>
+                </div>
+            </div>
+            <div class="frame-details-panel">
+                <h3>INTERAKTÍV KÉPKOCKA OLVASÓ</h3>
+                <p>Görgessen lefelé vagy felfelé a fenti szekcióban, és nézze, ahogy az alábbi ablakban a gyár leglátványosabb 10 egymást követő pillanata mozdul előre-hátra a mozgás irányának megfelelően.</p>
+                
+                <div class="frame-scrubber-hud">
+                    <div class="scrubber-hud-row">
+                        <span>AKTÍV FÁZIS:</span>
+                        <span id="scrub-phase">01 / DETEKTÁLÁS</span>
+                    </div>
+                    <div class="scrubber-hud-row">
+                        <span>SEBESSÉG VISSZAJELZÉS:</span>
+                        <span id="scrub-speed">0.00 px/sec</span>
+                    </div>
+                    <div class="scrubber-hud-row">
+                        <span>RENDSZER BUFFER:</span>
+                        <span style="color: var(--accent-pink) !important;">100% OK</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Auto-play Embedded Gallery -->
     <div class="gallery-section">
         <div class="section-header">
@@ -422,6 +556,29 @@
             document.getElementById('step3')
         ];
 
+        // 10 tetszőleges fázis leírása a képkockákhoz
+        const phases = [
+            "01 / DETEKTÁLÁS",
+            "02 / INDÍTÁS",
+            "03 / MOZGÁS STABILIZÁCIÓ",
+            "04 / PÁLYA ILLESZTÉS",
+            "05 / PRECIZIÓS BEÁLLÍTÁS",
+            "06 / RÖGZÍTÉSI CIKLUS",
+            "07 / MINŐSÉG ELLENŐRZÉS",
+            "08 / BELSŐ ADATÁTVITEL",
+            "09 / RENDSZER SYNC",
+            "10 / FOLYAMAT LEZÁRVA"
+        ];
+
+        // Frame scrubbing interactive variables
+        const frameImg = document.getElementById('frame-img');
+        const frameProgress = document.getElementById('frameProgress');
+        const scrubPhase = document.getElementById('scrub-phase');
+        const scrubSpeed = document.getElementById('scrub-speed');
+
+        let lastScrollY = window.scrollY;
+        let lastTime = Date.now();
+
         // Ensure video metadata is loaded so we have a duration
         video.addEventListener('loadedmetadata', () => {
             updateScrub();
@@ -452,6 +609,35 @@
             } else {
                 switchActiveStep(2);
             }
+
+            // --- 10 képkockás görgetésre reagáló animációs logika ---
+            const frameSection = document.getElementById('frame-section');
+            const frameRect = frameSection.getBoundingClientRect();
+            const startOffset = window.innerHeight; // start anim trigger early
+            
+            // Számoljuk ki a görgetési arányt a frame-section-höz képest
+            const totalFrameScrollHeight = frameSection.offsetHeight + window.innerHeight;
+            const currentFrameScrolled = window.innerHeight - frameRect.top;
+            
+            let frameRatio = Math.max(0, Math.min(0.99, currentFrameScrolled / totalFrameScrollHeight));
+            
+            // 10 képkockás index leosztás (0-tól 9-ig)
+            let frameIndex = Math.floor(frameRatio * 10);
+            
+            // Változtassuk a képkockák fázisát és a haladási csíkot
+            frameProgress.style.width = `${(frameIndex + 1) * 10}%`;
+            scrubPhase.innerText = phases[frameIndex];
+
+            // Szimuláljunk finom pixel-sebességmérést a görgetés tempójának megfelelően
+            const now = Date.now();
+            const dt = (now - lastTime) / 1000;
+            const dy = Math.abs(window.scrollY - lastScrollY);
+            if (dt > 0) {
+                const speed = dy / dt;
+                scrubSpeed.innerText = `${Math.round(speed)} px/sec`;
+            }
+            lastScrollY = window.scrollY;
+            lastTime = now;
         }
 
         function switchActiveStep(activeIndex) {
