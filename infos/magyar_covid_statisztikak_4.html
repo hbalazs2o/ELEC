@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magyarország COVID-19 — Teljes Járványstatisztika</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #222633;
+    --accent: #e63946;
+    --accent2: #f4a261;
+    --accent3: #2a9d8f;
+    --accent4: #457b9d;
+    --text: #e8eaf0;
+    --text-muted: #7a8099;
+    --text-dim: #3d4259;
+    --green: #52b788;
+    --yellow: #e9c46a;
+    --red: #e63946;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    padding: 70px 40px 60px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(230,57,70,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: #fff;
+    max-width: 800px;
+  }
+  header h1 span { color: var(--accent); }
+  .header-sub {
+    margin-top: 18px;
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 560px;
+  }
+  .header-date {
+    position: absolute;
+    top: 70px;
+    right: 40px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .virus-bg {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 340px;
+    height: 340px;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+  section { padding: 60px 40px; border-bottom: 1px solid var(--border); }
+
+  /* SECTION TITLE */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+    margin-bottom: 40px;
+  }
+  .stat-card {
+    background: var(--surface);
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--card-color, var(--accent));
+  }
+  .stat-card.red { --card-color: var(--red); }
+  .stat-card.green { --card-color: var(--green); }
+  .stat-card.yellow { --card-color: var(--yellow); }
+  .stat-card.blue { --card-color: var(--accent4); }
+  .stat-card.teal { --card-color: var(--accent3); }
+  .stat-card.orange { --card-color: var(--accent2); }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+  .stat-unit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+  .stat-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  /* WAVE CHART */
+  .chart-wrap {
+    background: var(--surface);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+  .chart-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  canvas { display: block; width: 100% !important; }
+
+  /* WAVE TIMELINE */
+  .waves-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+    margin-top: 24px;
+  }
+  .wave-card {
+    background: var(--surface);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .wave-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--border);
+    position: absolute;
+    right: 16px;
+    top: 10px;
+    line-height: 1;
+    user-select: none;
+  }
+  .wave-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .wave-title { font-weight: 600; font-size: 15px; color: #fff; margin-bottom: 6px; }
+  .wave-period { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+  .wave-stat { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .wave-stat span { color: var(--text); font-weight: 600; }
+  .wave-bar {
+    height: 3px;
+    background: var(--border);
+    margin-top: 16px;
+  }
+  .wave-bar-fill {
+    height: 3px;
+    background: var(--accent);
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0;
+  }
+
+  /* DONUT CHART */
+  .donut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin-top: 24px;
+  }
+  .donut-wrap {
+    background: var(--surface);
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { flex: 1; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-text { font-size: 13px; color: var(--text-muted); }
+  .legend-val { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text); margin-left: auto; }
+
+  /* BAR CHART */
+  .bars-wrap { padding: 24px 0; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .bar-label {
+    width: 140px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 22px;
+    background: var(--surface2);
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--bar-color, var(--accent));
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+    width: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+  }
+  .bar-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+  }
+
+  /* VACCINATION */
+  .vacc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  @media (max-width: 768px) {
+    .vacc-grid { grid-template-columns: 1fr; }
+    header { padding: 50px 20px 40px; }
+    .header-date { display: none; }
+    section { padding: 40px 20px; }
+    .bar-label { width: 100px; }
+  }
+  .vacc-progress {
+    background: var(--surface);
+    padding: 28px;
+  }
+  .vacc-title {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+  }
+  .radial-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .radial-info { flex: 1; }
+  .radial-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+  .radial-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+  /* COMPARISON */
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  .compare-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .compare-table tr:hover td { background: var(--surface2); }
+  .compare-table td:first-child { color: #fff; font-weight: 600; }
+  .country-flag { margin-right: 8px; }
+  .highlight-row td { background: rgba(230,57,70,0.06) !important; }
+  .highlight-row td:first-child { color: var(--accent); }
+  .mini-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .mini-bar { height: 6px; border-radius: 0; background: var(--border); flex: 1; overflow: hidden; }
+  .mini-bar-fill { height: 6px; background: var(--accent); transition: width 1.4s ease; width: 0; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.5s ease;
+  }
+  .tl-item.visible { opacity: 1; transform: translateX(0); }
+  .tl-dot {
+    position: absolute;
+    left: -28px;
+    top: 5px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .tl-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .tl-text { font-size: 13px; color: var(--text-muted); }
+  .tl-text strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  footer a { color: var(--text-muted); }
+
+  /* NNGYK COMPACT STRIP */
+  .nngyk-strip {
+    display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 16px;
+  }
+  .nngyk-pill {
+    background: var(--surface); padding: 10px 16px; display: flex; flex-direction: column;
+    gap: 2px; flex: 1; min-width: 130px;
+  }
+  .nngyk-pill.teal { border-top: 2px solid var(--accent3); }
+  .nngyk-pill.blue { border-top: 2px solid var(--accent4); }
+  .nngyk-pill.green { border-top: 2px solid var(--green); }
+  .nngyk-pill.orange { border-top: 2px solid var(--accent2); }
+  .nngyk-pill.red { border-top: 2px solid var(--red); }
+  .nngyk-pill.yellow { border-top: 2px solid var(--yellow); }
+  .np-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); }
+  .np-val { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  /* NNGYK COMPACT GRID */
+  .nngyk-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 2px;
+  }
+  .nngyk-card {
+    background: var(--surface); padding: 14px 16px;
+    border-left: 3px solid var(--nc, var(--accent));
+  }
+  .nc-period { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+  .nc-variant { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 5px; }
+  .nc-level { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 6px; display: inline-block; margin-bottom: 6px; }
+  .nc-level.magas { background: rgba(230,57,70,0.2); color: #e63946; }
+  .nc-level.emelkedett { background: rgba(244,162,97,0.2); color: #f4a261; }
+  .nc-level.mers { background: rgba(233,196,106,0.2); color: #e9c46a; }
+  .nc-level.alacsony { background: rgba(82,183,136,0.2); color: #52b788; }
+  .nc-note { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+
+  /* SEWAGE META */
+  .sewage-meta {
+    display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 16px;
+  }
+  .sm-item {
+    background: var(--surface); padding: 10px 16px; flex: 1; min-width: 200px;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .sm-k { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); }
+  .sm-v { font-size: 12px; color: var(--text-muted); }
+
+  /* SEWAGE INTERACTIVE */
+  .sewage-container { background: var(--surface); padding: 0; }
+  .sewage-toolbar {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px;
+    border-bottom: 1px solid var(--border); align-items: center;
+  }
+  .stb-left { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+  .stb-right { display: flex; gap: 4px; flex-wrap: wrap; }
+  .zoom-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    padding: 5px 12px; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  }
+  .zoom-btn:hover { color: var(--text); border-color: var(--text-muted); }
+  .zoom-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tool-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    padding: 5px 12px; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  }
+  .tool-btn:hover { color: var(--text); border-color: var(--text-muted); }
+  .tool-btn.off { opacity: 0.5; }
+  .sewage-tip {
+    position: absolute; background: rgba(10,12,16,0.95); border: 1px solid var(--border);
+    padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--text); pointer-events: none; z-index: 100; max-width: 220px;
+    line-height: 1.6;
+  }
+  .sewage-legend {
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted);
+  }
+  .sl-item { display: flex; align-items: center; gap: 7px; }
+  .sl-dot { width: 10px; height: 10px; flex-shrink: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* ANIMATE */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* INFO BOX */
+  .info-box {
+    background: var(--surface);
+    border-left: 3px solid var(--accent4);
+    padding: 18px 22px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .info-box strong { color: var(--text); }
+
+  /* VARIANT PILLS */
+  .variant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 2px;
+    margin-top: 20px;
+  }
+  .variant-pill {
+    background: var(--surface);
+    padding: 18px 20px;
+    border-top: 2px solid var(--v-color, var(--accent));
+  }
+  .variant-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .variant-period { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .variant-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- VIRUS SVG BACKGROUND -->
+<svg class="virus-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="60" fill="none" stroke="white" stroke-width="3"/>
+  <circle cx="100" cy="100" r="40" fill="white" opacity="0.5"/>
+  <line x1="100" y1="30" x2="100" y2="15" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="100" cy="10" r="7" fill="white"/>
+  <line x1="100" y1="170" x2="100" y2="185" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="100" cy="190" r="7" fill="white"/>
+  <line x1="30" y1="100" x2="15" y2="100" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="10" cy="100" r="7" fill="white"/>
+  <line x1="170" y1="100" x2="185" y2="100" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="190" cy="100" r="7" fill="white"/>
+  <line x1="57" y1="57" x2="46" y2="46" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="41" cy="41" r="7" fill="white"/>
+  <line x1="143" y1="57" x2="154" y2="46" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="159" cy="41" r="7" fill="white"/>
+  <line x1="57" y1="143" x2="46" y2="154" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="41" cy="159" r="7" fill="white"/>
+  <line x1="143" y1="143" x2="154" y2="154" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="159" cy="159" r="7" fill="white"/>
+</svg>
+
+<!-- HEADER -->
+<header>
+  <div class="header-label">// Járványstatisztika — 2020–2023</div>
+  <h1>Magyarország<br><span>COVID-19</span><br>Járvány</h1>
+  <p class="header-sub">Átfogó statisztikai összefoglaló a magyarországi koronavírus-járványról — fertőzések, halálozások, oltások és hullámok alapján.</p>
+  <div class="header-date">
+    Adatforrások:<br>
+    koronavirus.gov.hu<br>
+    KSH · WHO · Our World in Data<br>
+    Wikipedia · Johns Hopkins Univ.
+  </div>
+</header>
+
+<!-- SECTION 1: KEY STATS -->
+<section id="stats">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Összesített Számok</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="stats-grid fade-in">
+    <div class="stat-card red">
+      <div class="stat-label">Összes fertőzött</div>
+      <div class="stat-value" id="cnt-infected">0</div>
+      <div class="stat-unit">igazolt eset</div>
+      <div class="stat-sub">2020 márc. – 2022 vége</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">Elhunyt</div>
+      <div class="stat-value" id="cnt-dead">0</div>
+      <div class="stat-unit">bejelentett haláleset</div>
+      <div class="stat-sub">~100 ezer fő feletti becslések is vannak</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Felgyógyult</div>
+      <div class="stat-value" id="cnt-recovered">0</div>
+      <div class="stat-unit">gyógyult eset</div>
+      <div class="stat-sub">a fertőzöttek ~93%-a</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Beoltott</div>
+      <div class="stat-value" id="cnt-vacc">0</div>
+      <div class="stat-unit">legalább 1 adagot kapott</div>
+      <div class="stat-sub">a felnőtt lakosság ~63%-a</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-label">Elvégzett tesztek</div>
+      <div class="stat-value" id="cnt-tests">0</div>
+      <div class="stat-unit">PCR és antigén összesen</div>
+      <div class="stat-sub">2020–2022</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">Halálozási arány</div>
+      <div class="stat-value">3,7<span style="font-size:22px">%</span></div>
+      <div class="stat-unit">CFR — case fatality rate</div>
+      <div class="stat-sub">eu-s átlag: ~1,5–2%</div>
+    </div>
+  </div>
+  <div class="info-box fade-in">
+    <strong>Megjegyzés a számokról:</strong> Magyarország első hullámbeli statisztikáira jellemző volt az alacsony esetszám melletti kiemelkedően magas (~14%-os) halálozási arány. Ez nem az egészségügyi rendszer összeomlásából, hanem a rendkívül alacsony tesztelési kapacitásból fakadt — becslések szerint az első hullámban minden 14–15. esetet sikerült csak kimutatni. A 2 milliós igazolt esetszámot 2022 augusztusában haladta meg az ország.
+  </div>
+</section>
+
+<!-- SECTION 2: HULLÁMOK -->
+<section id="waves">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">A Járvány Hullámai</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="chart-wrap fade-in">
+    <div class="chart-title">// Napi új esetek — stilizált hullámábra (becsült relatív adatok alapján)</div>
+    <canvas id="waveChart" height="180"></canvas>
+  </div>
+
+  <div class="waves-grid">
+    <div class="wave-card fade-in">
+      <div class="wave-num">I</div>
+      <div class="wave-tag">// 1. hullám</div>
+      <div class="wave-title">Az első sokk</div>
+      <div class="wave-period">2020. március — 2020. augusztus</div>
+      <div class="wave-stat">Csúcs eset/nap: <span>~200–300 fő</span></div>
+      <div class="wave-stat">Halálozási arány: <span>~14% (alacsony detektálás)</span></div>
+      <div class="wave-stat">Kórházban: <span>max. ~500 fő</span></div>
+      <div class="wave-stat">Intézkedés: <span>veszélyhelyzet, kijárási tilalom</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="18"></div></div>
+    </div>
+    <div class="wave-card fade-in">
+      <div class="wave-num">II</div>
+      <div class="wave-tag">// 2. hullám</div>
+      <div class="wave-title">Az őszi robbanás</div>
+      <div class="wave-period">2020. augusztus — 2021. február</div>
+      <div class="wave-stat">Csúcs eset/nap: <span>~6 000–7 000 fő</span></div>
+      <div class="wave-stat">Halálozási arány: <span>~2–3%</span></div>
+      <div class="wave-stat">Kórházban: <span>max. ~9 500 fő</span></div>
+      <div class="wave-stat">Intézkedés: <span>éjszakai kijárási tilalom, iskolazárás</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="60"></div></div>
+    </div>
+    <div class="wave-card fade-in">
+      <div class="wave-num">III</div>
+      <div class="wave-tag">// 3. hullám</div>
+      <div class="wave-title">A brit variáns</div>
+      <div class="wave-period">2021. február — 2021. május</div>
+      <div class="wave-stat">Csúcs eset/nap: <span>~11 000 fő (alfa variáns)</span></div>
+      <div class="wave-stat">Halálozási arány: <span>~1,5–2%</span></div>
+      <div class="wave-stat">Kórházban: <span>max. ~13 000 fő (rekord)</span></div>
+      <div class="wave-stat">Intézkedés: <span>iskolazárás, teljes lockdown</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="88"></div></div>
+    </div>
+    <div class="wave-card fade-in">
+      <div class="wave-num">IV</div>
+      <div class="wave-tag">// 4. hullám</div>
+      <div class="wave-title">Delta hullám</div>
+      <div class="wave-period">2021. ősz — 2021. december</div>
+      <div class="wave-stat">Csúcs eset/nap: <span>~10 000–12 000 fő</span></div>
+      <div class="wave-stat">Halálozási arány: <span>~1–1,5%</span></div>
+      <div class="wave-stat">Kórházban: <span>max. ~9 000 fő</span></div>
+      <div class="wave-stat">Intézkedés: <span>védettségi igazolvány, emlékeztető oltás</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="78"></div></div>
+    </div>
+    <div class="wave-card fade-in">
+      <div class="wave-num">V</div>
+      <div class="wave-tag">// 5. hullám</div>
+      <div class="wave-title">Omikron — rekord eset, enyhe lefolyás</div>
+      <div class="wave-period">2022. január — 2022. március</div>
+      <div class="wave-stat">Csúcs eset/nap: <span>~30 000+ fő (valaha volt legmagasabb)</span></div>
+      <div class="wave-stat">Halálozási arány: <span>&lt;0,5%</span></div>
+      <div class="wave-stat">Kórházban: <span>max. ~5 000 fő</span></div>
+      <div class="wave-stat">Intézkedés: <span>minimális korlátozás, oltástámogatás</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="100"></div></div>
+    </div>
+    <div class="wave-card fade-in">
+      <div class="wave-num">VI</div>
+      <div class="wave-tag">// 6. hullám és vége</div>
+      <div class="wave-title">Nyári és őszi hullámok</div>
+      <div class="wave-period">2022. május — 2023. január</div>
+      <div class="wave-stat">Csúcs eset/nap: <span>~15 000–20 000 fő</span></div>
+      <div class="wave-stat">Halálozási arány: <span>&lt;0,3%</span></div>
+      <div class="wave-stat">Kórházban: <span>max. ~2 500 fő</span></div>
+      <div class="wave-stat">Adatközlés vége: <span>2023. január 1-jén leáll</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="55"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: HALÁLOZÁS -->
+<section id="mortality">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Halálozási Adatok</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="donut-grid">
+    <div class="donut-wrap fade-in">
+      <svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="50" fill="none" stroke="#1a1f2e" stroke-width="18"/>
+        <circle cx="65" cy="65" r="50" fill="none" stroke="#e63946" stroke-width="18"
+          stroke-dasharray="314" stroke-dashoffset="314" id="donut1"
+          stroke-linecap="butt" transform="rotate(-90 65 65)"/>
+        <text x="65" y="60" text-anchor="middle" fill="white" font-family="Playfair Display,serif" font-size="18" font-weight="900">47 246</text>
+        <text x="65" y="78" text-anchor="middle" fill="#7a8099" font-family="IBM Plex Mono,monospace" font-size="9">ELHUNYT</text>
+      </svg>
+      <div class="donut-legend">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;font-family:'IBM Plex Mono',monospace;">Elhunytak nem szerint</div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e63946"></div>
+          <span class="legend-text">Férfi</span>
+          <span class="legend-val">~56%</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#457b9d"></div>
+          <span class="legend-text">Nő</span>
+          <span class="legend-val">~44%</span>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Átlag életkor: <strong style="color:var(--text)">76 év</strong></div>
+        <div style="font-size:12px;color:var(--text-muted);">60+ évesek: <strong style="color:var(--text)">~89%</strong></div>
+      </div>
+    </div>
+    <div class="donut-wrap fade-in">
+      <svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="50" fill="none" stroke="#1a1f2e" stroke-width="18"/>
+        <circle cx="65" cy="65" r="50" fill="none" stroke="#f4a261" stroke-width="18"
+          stroke-dasharray="314" stroke-dashoffset="314" id="donut2"
+          stroke-linecap="butt" transform="rotate(-90 65 65)"/>
+        <text x="65" y="60" text-anchor="middle" fill="white" font-family="Playfair Display,serif" font-size="16" font-weight="900">+14%</text>
+        <text x="65" y="78" text-anchor="middle" fill="#7a8099" font-family="IBM Plex Mono,monospace" font-size="9">TÖBBLET</text>
+      </svg>
+      <div class="donut-legend">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;font-family:'IBM Plex Mono',monospace;">Többlethalálozás 2020–21</div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f4a261"></div>
+          <span class="legend-text">Bejelentett COVID</span>
+          <span class="legend-val">~30 000</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e9c46a"></div>
+          <span class="legend-text">Becsült többlet</span>
+          <span class="legend-val">~50 000+</span>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">A KSH adatok alapján a járvány<br>~14%-os halálozás-többletet okozott.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2px;" class="fade-in">
+    <div class="chart-wrap">
+      <div class="chart-title">// Elhunytak korcsoport szerint (% arány)</div>
+      <div class="bars-wrap">
+        <div class="bar-row">
+          <div class="bar-label">80+ év</div>
+          <div class="bar-track"><div class="bar-fill" data-width="52" style="--bar-color:#e63946;"><span class="bar-val">~52%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">70–79 év</div>
+          <div class="bar-track"><div class="bar-fill" data-width="27" style="--bar-color:#f4a261;"><span class="bar-val">~27%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">60–69 év</div>
+          <div class="bar-track"><div class="bar-fill" data-width="13" style="--bar-color:#e9c46a;"><span class="bar-val">~13%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">50–59 év</div>
+          <div class="bar-track"><div class="bar-fill" data-width="6" style="--bar-color:#457b9d;"><span class="bar-val">~6%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">50 év alatt</div>
+          <div class="bar-track"><div class="bar-fill" data-width="2" style="--bar-color:#2a9d8f;"><span class="bar-val">~2%</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: OLTÁSOK -->
+<section id="vaccination">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Oltási Program</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="vacc-grid fade-in">
+    <div class="vacc-progress">
+      <div class="vacc-title">// Beoltottság (legalább 1 adag)</div>
+      <div class="radial-wrap">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1a1f2e" stroke-width="12"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#52b788" stroke-width="12"
+            stroke-dasharray="289" stroke-dashoffset="289" id="radial1"
+            stroke-linecap="butt" transform="rotate(-90 55 55)"/>
+          <text x="55" y="50" text-anchor="middle" fill="white" font-family="Playfair Display,serif" font-size="18" font-weight="900">63%</text>
+          <text x="55" y="67" text-anchor="middle" fill="#7a8099" font-family="IBM Plex Mono,monospace" font-size="9">BEOLTOTT</text>
+        </svg>
+        <div class="radial-info">
+          <div class="radial-big">6,2M</div>
+          <div class="radial-sub">fő kapott legalább 1 adagot<br>a ~9,7 milliós összlakosságból</div>
+        </div>
+      </div>
+    </div>
+    <div class="vacc-progress">
+      <div class="vacc-title">// Teljesen beoltott (2 adag)</div>
+      <div class="radial-wrap">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#1a1f2e" stroke-width="12"/>
+          <circle cx="55" cy="55" r="46" fill="none" stroke="#457b9d" stroke-width="12"
+            stroke-dasharray="289" stroke-dashoffset="289" id="radial2"
+            stroke-linecap="butt" transform="rotate(-90 55 55)"/>
+          <text x="55" y="50" text-anchor="middle" fill="white" font-family="Playfair Display,serif" font-size="18" font-weight="900">57%</text>
+          <text x="55" y="67" text-anchor="middle" fill="#7a8099" font-family="IBM Plex Mono,monospace" font-size="9">2 ADAG</text>
+        </svg>
+        <div class="radial-info">
+          <div class="radial-big">5,5M</div>
+          <div class="radial-sub">fő kapta meg mindkét adagot,<br>emlékeztető: ~2,9M fő</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2px;" class="fade-in">
+    <div class="chart-wrap">
+      <div class="chart-title">// Oltóanyagok megoszlása Magyarországon</div>
+      <div class="bars-wrap">
+        <div class="bar-row">
+          <div class="bar-label">Pfizer–BioNTech</div>
+          <div class="bar-track"><div class="bar-fill" data-width="45" style="--bar-color:#52b788;"><span class="bar-val">~45%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Sinopharm</div>
+          <div class="bar-track"><div class="bar-fill" data-width="24" style="--bar-color:#457b9d;"><span class="bar-val">~24%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">AstraZeneca</div>
+          <div class="bar-track"><div class="bar-fill" data-width="14" style="--bar-color:#e9c46a;"><span class="bar-val">~14%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Sputnik V</div>
+          <div class="bar-track"><div class="bar-fill" data-width="10" style="--bar-color:#f4a261;"><span class="bar-val">~10%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Moderna</div>
+          <div class="bar-track"><div class="bar-fill" data-width="5" style="--bar-color:#2a9d8f;"><span class="bar-val">~5%</span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Janssen (J&amp;J)</div>
+          <div class="bar-track"><div class="bar-fill" data-width="2" style="--bar-color:#e63946;"><span class="bar-val">~2%</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box">
+      <strong>Különlegesség:</strong> Magyarország volt az egyetlen EU-s tagállam, amely keleti oltóanyagokat is alkalmazott — a kínai Sinopharm és az orosz Sputnik V vakcinát. Az oltási kampány 2020. december 26-án indult el, Magyarország az EU-ban az elsők között kezdte meg a beoltást. Az emlékeztető oltáshoz a beoltottak 98%-a azonban már nyugati vakcinát választott.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: VARIÁNSOK -->
+<section id="variants">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Variánsok Magyarországon</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="variant-grid fade-in">
+    <div class="variant-pill" style="--v-color:#7a8099">
+      <div class="variant-name">Vad típus</div>
+      <div class="variant-period">2020. márc. – 2020. dec.</div>
+      <div class="variant-desc">Az eredeti SARS-CoV-2 törzs. Alacsony terjedési ráta, de súlyos lefolyás. Magyarország az első esetet 2020. március 4-én jelentette be.</div>
+    </div>
+    <div class="variant-pill" style="--v-color:#e9c46a">
+      <div class="variant-name">Alfa (B.1.1.7)</div>
+      <div class="variant-period">2021. február – 2021. május</div>
+      <div class="variant-desc">Brit mutáns. Kb. 50–70%-kal fertőzőbb az eredeti törzsnél. Okozta a legsúlyosabb, 3. hullámot. Rekord kórházi terhelés: 13 000+ ápolt.</div>
+    </div>
+    <div class="variant-pill" style="--v-color:#f4a261">
+      <div class="variant-name">Delta (B.1.617.2)</div>
+      <div class="variant-period">2021. június – 2022. január</div>
+      <div class="variant-desc">Indiai mutáns. Az alfa-nál is fertőzőbb. Súlyos lefolyás, különösen az oltatlanok körében. A 4. hullámot ez a variáns uralta.</div>
+    </div>
+    <div class="variant-pill" style="--v-color:#2a9d8f">
+      <div class="variant-name">Omikron (B.1.1.529)</div>
+      <div class="variant-period">2021. dec. – 2022. vége</div>
+      <div class="variant-desc">Rendkívül fertőző, de enyhébb lefolyású. Rekord napi esetszámok (30 000+), alacsonyabb kórházi terhelés. Számos alváriánsa terjedt el.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: ÖSSZEHASONLÍTÁS -->
+<section id="comparison">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Európai Összehasonlítás</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="fade-in">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Ország</th>
+          <th>Haláleset / 1M fő</th>
+          <th>Arányosítva</th>
+          <th>Oltottság</th>
+          <th>Összes eset / 1M</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="country-flag">🇵🇪</span>Peru</td>
+          <td>6 408</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="100" style="background:#e63946"></div></div></div></td>
+          <td>~53%</td>
+          <td>94 300</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><span class="country-flag">🇭🇺</span>Magyarország</td>
+          <td>4 812</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="75" style="background:#e63946"></div></div></div></td>
+          <td>~63%</td>
+          <td>209 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇨🇿</span>Csehország</td>
+          <td>4 450</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="69" style="background:#f4a261"></div></div></div></td>
+          <td>~65%</td>
+          <td>271 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇸🇰</span>Szlovákia</td>
+          <td>3 690</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="58" style="background:#e9c46a"></div></div></div></td>
+          <td>~56%</td>
+          <td>215 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇵🇱</span>Lengyelország</td>
+          <td>3 154</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="49" style="background:#e9c46a"></div></div></div></td>
+          <td>~58%</td>
+          <td>163 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇦🇹</span>Ausztria</td>
+          <td>2 208</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="34" style="background:#457b9d"></div></div></div></td>
+          <td>~75%</td>
+          <td>456 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇩🇪</span>Németország</td>
+          <td>1 853</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="29" style="background:#457b9d"></div></div></div></td>
+          <td>~77%</td>
+          <td>340 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇫🇷</span>Franciaország</td>
+          <td>2 290</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="36" style="background:#2a9d8f"></div></div></div></td>
+          <td>~78%</td>
+          <td>490 000</td>
+        </tr>
+        <tr>
+          <td><span class="country-flag">🇳🇴</span>Norvégia</td>
+          <td>392</td>
+          <td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" data-width="6" style="background:#52b788"></div></div></div></td>
+          <td>~80%</td>
+          <td>247 000</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="info-box" style="margin-top:16px;">
+      <strong>Magyarország helyzete:</strong> Az egy millió főre jutó COVID-halálozásban Magyarország Európa legsúlyosabban érintett országai közé tartozott — a bejelentett adatok alapján csak Csehország és néhány kisebb állam előzött meg bennünket egy időszakban. A túlélési esélyek az oltottság növekedésével drasztikusan javultak.
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: IDŐVONAL -->
+<section id="timeline">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Kulcseseményei a Járványnak</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. január 31.</div>
+      <div class="tl-text"><strong>Operatív Törzs felállítása</strong> — a kormány megelőző intézkedésként járványügyi operatív törzset hoz létre a COVID-19 terjedésének figyelésére.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. március 4.</div>
+      <div class="tl-text"><strong>Első igazolt esetek</strong> — két iráni diák, akik Magyarországon tanultak. Az egyik Semmelweis-hallgató, a másik gödöllői egyetemista.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. március 11.</div>
+      <div class="tl-text"><strong>Veszélyhelyzet</strong> — az ország veszélyhelyzetet hirdet. Különleges jogrend lép életbe, iskolák bezárnak, rendezvényeket tiltanak.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. március 28.</div>
+      <div class="tl-text"><strong>Kijárási tilalom</strong> — este 8-tól reggel 5-ig kijárási tilalom lép életbe Budapesten és a többi városban.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. június</div>
+      <div class="tl-text"><strong>Az első hullám lecseng</strong> — az aktív esetek száma csökkenni kezd, a korlátozások enyhülnek.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. november 11.</div>
+      <div class="tl-text"><strong>Éjszakai kijárási tilalom</strong> — a 2. hullám csúcsán este 8-tól reggel 5-ig ismét tilos az utcán tartózkodni. Vendéglátóhelyek bezárnak.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2020. december 26.</div>
+      <div class="tl-text"><strong>Első oltás Magyarországon</strong> — az EU-ban az elsők között kezdik meg az oltási kampányt, Pfizer–BioNTech vakcinával, egy nővér az első beoltott.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2021. február</div>
+      <div class="tl-text"><strong>Sputnik V és Sinopharm érkezik</strong> — Magyarország keleti vakcinák alkalmazását is elkezdi, EU-s egyedülállóként.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2021. március–április</div>
+      <div class="tl-text"><strong>3. hullám csúcsa</strong> — az alfa variáns hatására rekord: 13 000+ kórházi beteg, ~13 000 lélegeztetett, ~150 halott naponta.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2021. április 19.</div>
+      <div class="tl-text"><strong>Iskolák részleges nyitása</strong> — az oltási tempóra hivatkozva fokozatosan oldják a lezárásokat.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2021. május–június</div>
+      <div class="tl-text"><strong>Védettségi igazolvány</strong> — a beoltottak különleges jogokat kapnak, megnyílnak az éttermek és rendezvények az igazolvánnyal rendelkezőknek.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2022. február</div>
+      <div class="tl-text"><strong>Omikron csúcs</strong> — napi 30 000+ új eset, de az enyhébb lefolyás miatt kisebb kórházi terhelés. Az oltottak védettségének köszönhetően alacsony halálozás.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2022. augusztus</div>
+      <div class="tl-text"><strong>2 millió igazolt fertőzött</strong> — az összes beazonosított fertőzött átlépi a kétmilliós határt.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-date">2023. január 1.</div>
+      <div class="tl-text"><strong>Adatközlés vége</strong> — a koronavirus.gov.hu oldal megszűnik, a napi adatközlés leáll. A pandémia endémiás fázisba lép.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--green)"></div>
+      <div class="tl-date">2023. május 5.</div>
+      <div class="tl-text"><strong>WHO: vége a globális vészhelyzetnek</strong> — az Egészségügyi Világszervezet bejelenti, hogy a COVID-19 már nem minősül globális közegészségügyi vészhelyzetnek.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 8: GAZDASÁGI HATÁS -->
+<section id="economy">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Gazdasági és Társadalmi Hatás</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="waves-grid fade-in">
+    <div class="wave-card">
+      <div class="wave-tag">// GDP visszaesés</div>
+      <div class="wave-title">−4,8% GDP 2020-ban</div>
+      <div class="wave-period">A koronavírus-járvány gazdasági hatása</div>
+      <div class="wave-stat">2021-es visszapattanás: <span>+7,1%</span></div>
+      <div class="wave-stat">Munkanélküliség csúcs: <span>~5%</span></div>
+      <div class="wave-stat">Állásvesztés: <span>tízezrek, főként rövid időre</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="48" style="background:var(--accent2)"></div></div>
+    </div>
+    <div class="wave-card">
+      <div class="wave-tag">// Egészségügy</div>
+      <div class="wave-title">Rendkívüli egészségügyi terhelés</div>
+      <div class="wave-period">A kórházi ellátórendszer próbatétele</div>
+      <div class="wave-stat">Max. kórházi betegek: <span>~13 000 fő (2021 ápr.)</span></div>
+      <div class="wave-stat">Max. lélegeztetett: <span>~1 400 fő egyszerre</span></div>
+      <div class="wave-stat">Elvásárolt eszközök: <span>lélegeztetők, PPE</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="85" style="background:var(--red)"></div></div>
+    </div>
+    <div class="wave-card">
+      <div class="wave-tag">// Oktatás</div>
+      <div class="wave-title">Digitális oktatásra való áttérés</div>
+      <div class="wave-period">Közel 2 év iskola-bezárás egyes időszakokban</div>
+      <div class="wave-stat">Online oktatás: <span>millió tanulót érintett</span></div>
+      <div class="wave-stat">Érintett tanulók: <span>~1,4 millió tanuló</span></div>
+      <div class="wave-stat">Platform: <span>Kréta, Google Classroom</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="70" style="background:var(--accent4)"></div></div>
+    </div>
+    <div class="wave-card">
+      <div class="wave-tag">// Rendészet</div>
+      <div class="wave-title">Rendfenntartás és bírságok</div>
+      <div class="wave-period">A korlátozások betartatása</div>
+      <div class="wave-stat">Kijárási tilalom megszegés: <span>69 424 eset</span></div>
+      <div class="wave-stat">Karantén megszegés: <span>6 213 eset</span></div>
+      <div class="wave-stat">Maszkszabály megsértés: <span>73 143 eset</span></div>
+      <div class="wave-bar"><div class="wave-bar-fill" data-width="35" style="background:var(--yellow)"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 9: NNGYK ENDÉMIÁS KORSZAK -->
+<section id="nngyk">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">NNGYK — Az Endémiás Korszak (2023–2026)</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <!-- Compact info strip -->
+  <div class="nngyk-strip fade-in">
+    <div class="nngyk-pill teal"><span class="np-label">Rendszer indult</span><span class="np-val">2020. jún.</span></div>
+    <div class="nngyk-pill blue"><span class="np-label">Telepek száma</span><span class="np-val">22 db</span></div>
+    <div class="nngyk-pill green"><span class="np-label">Népes. lefedettség</span><span class="np-val">&gt;40%</span></div>
+    <div class="nngyk-pill orange"><span class="np-label">Módszer</span><span class="np-val">RT-qPCR → dPCR</span></div>
+    <div class="nngyk-pill red"><span class="np-label">Előrejelzés</span><span class="np-val">1–2 hét előre</span></div>
+    <div class="nngyk-pill yellow"><span class="np-label">Adatforrások</span><span class="np-val">EESZT · SARI · Sentinel</span></div>
+  </div>
+
+  <!-- Compact period cards -->
+  <div class="nngyk-grid fade-in">
+    <div class="nngyk-card" style="--nc:#457b9d">
+      <div class="nc-period">2023 aug–dec.</div>
+      <div class="nc-variant">EG.5 / HV.1</div>
+      <div class="nc-level emelkedett">EMELKEDETT</div>
+      <div class="nc-note">339 SARI/hét · 45% COVID a kórháziakban</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e63946">
+      <div class="nc-period">2024 jan–febr.</div>
+      <div class="nc-variant">JN.1 (BA.2.86)</div>
+      <div class="nc-level magas">MAGAS (4 helyen)</div>
+      <div class="nc-note">JN.1 kizárólagossá vált · stagnálás után ↓</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#52b788">
+      <div class="nc-period">2024 márc–júl.</div>
+      <div class="nc-variant">JN.1 → KP.2</div>
+      <div class="nc-level alacsony">ALACSONY</div>
+      <div class="nc-note">Folyamatos csökkenés · KP.2 (FLiRT) megjelenik (20. hét)</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e63946">
+      <div class="nc-period">2024 aug–okt.</div>
+      <div class="nc-variant">KP.3 / KP.3.1.1</div>
+      <div class="nc-level magas">MAGAS / EMELKEDETT</div>
+      <div class="nc-note">KP.3.1.1 = 64,7% · SARI pozitivitás 56% (36. hét)</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e9c46a">
+      <div class="nc-period">2024 nov–2025 jan.</div>
+      <div class="nc-variant">KP.3 → XEC</div>
+      <div class="nc-level mers">MÉRSÉKELT</div>
+      <div class="nc-note">Influenza A felülmúlja a COVID-ot a kórháziakban</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#52b788">
+      <div class="nc-period">2025 jan–márc.</div>
+      <div class="nc-variant">XEC</div>
+      <div class="nc-level alacsony">ALACSONY</div>
+      <div class="nc-note">XEC domináns · influenza domináns szezon</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e9c46a">
+      <div class="nc-period">2025 ápr–aug.</div>
+      <div class="nc-variant">XEC alvariánsok</div>
+      <div class="nc-level mers">MÉRSÉKELT</div>
+      <div class="nc-note">Nyári emelkedés · légúti szezon 40. hétben indul</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#f4a261">
+      <div class="nc-period">2025 szept–nov.</div>
+      <div class="nc-variant">XEC alvariánsok</div>
+      <div class="nc-level emelkedett">EMELKEDETT</div>
+      <div class="nc-note">47. héten csökkenő tendencia · endémiás minta</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e9c46a">
+      <div class="nc-period">2025 dec–2026 márc.</div>
+      <div class="nc-variant">XEC leszárm.</div>
+      <div class="nc-level mers">MÉRSÉKELT</div>
+      <div class="nc-note">Szezonos COVID oltás: Spikevax JN.1 (Moderna) · stagnálás</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 10: INTERAKTÍV SZENNYVÍZ GRAFIKON -->
+<section id="szennyviz">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Szennyvíz SARS-CoV-2 Koncentráció — Interaktív Grafikon</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="sewage-meta fade-in">
+    <div class="sm-item"><span class="sm-k">Időszak</span><span class="sm-v">2020. jún. 1. – 2026. márc. 21.</span></div>
+    <div class="sm-item"><span class="sm-k">Adatforrás</span><span class="sm-v">NNK/NNGYK heti jelentések + Róka et al. 2021 (Sci Total Env.) + NNGYK.gov.hu</span></div>
+    <div class="sm-item"><span class="sm-k">Módszer</span><span class="sm-v">RT-qPCR (2020–2022) → RT-ddPCR (2022–) → dPCR (2023–)</span></div>
+    <div class="sm-item"><span class="sm-k">Skála</span><span class="sm-v">Relatív (0–100), NNGYK kategóriák alapján normalizálva</span></div>
+  </div>
+
+  <!-- Interaktív grafikon konténer -->
+  <div class="sewage-container fade-in">
+    <!-- Toolbar -->
+    <div class="sewage-toolbar">
+      <div class="stb-left">
+        <button class="zoom-btn active" data-range="all">Teljes időszak</button>
+        <button class="zoom-btn" data-range="2020">2020</button>
+        <button class="zoom-btn" data-range="2021">2021</button>
+        <button class="zoom-btn" data-range="2022">2022</button>
+        <button class="zoom-btn" data-range="2023">2023</button>
+        <button class="zoom-btn" data-range="2024">2024</button>
+        <button class="zoom-btn" data-range="2025">2025–26</button>
+      </div>
+      <div class="stb-right">
+        <button class="tool-btn" id="toggleSmooth">🔘 Simítás: BE</button>
+        <button class="tool-btn" id="toggleAnnot">📍 Feliratok: BE</button>
+        <button class="tool-btn" id="downloadChart">⬇ PNG letöltés</button>
+        <button class="tool-btn" id="downloadCSV">⬇ CSV letöltés</button>
+      </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="sewageTip" class="sewage-tip" style="display:none;"></div>
+
+    <!-- Canvas -->
+    <div style="position:relative;">
+      <canvas id="sewageChart2" height="300"></canvas>
+    </div>
+
+    <!-- Legend -->
+    <div class="sewage-legend">
+      <div class="sl-item"><div class="sl-dot" style="background:#e63946"></div><span>MAGAS (&gt;80%)</span></div>
+      <div class="sl-item"><div class="sl-dot" style="background:#f4a261"></div><span>EMELKEDETT (50–80%)</span></div>
+      <div class="sl-item"><div class="sl-dot" style="background:#e9c46a"></div><span>MÉRSÉKELT (20–50%)</span></div>
+      <div class="sl-item"><div class="sl-dot" style="background:#52b788"></div><span>ALACSONY (&lt;20%)</span></div>
+      <div class="sl-item"><div style="width:24px;height:2px;background:rgba(255,255,255,0.7);flex-shrink:0;"></div><span>Simított görbe</span></div>
+      <div class="sl-item" style="margin-left:auto;color:var(--text-dim);font-size:10px;">2020 jún.–aug.: Budapest 3 telep (RT-qPCR) · Forrás: Róka et al. 2021</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 11: USA COVID SZENNYVÍZ — PMC / CDC NWSS -->
+<section id="usa">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">USA — COVID-19 Szennyvíz & Terjedés (PMC / CDC NWSS)</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <!-- USA meta strip -->
+  <div class="nngyk-strip fade-in">
+    <div class="nngyk-pill teal"><span class="np-label">Rendszer indult</span><span class="np-val">2020. szept.</span></div>
+    <div class="nngyk-pill blue"><span class="np-label">Telepek száma (csúcson)</span><span class="np-val">&gt;1 500 db</span></div>
+    <div class="nngyk-pill green"><span class="np-label">Népes. lefedettség</span><span class="np-val">~47%</span></div>
+    <div class="nngyk-pill orange"><span class="np-label">Adatforrás</span><span class="np-val">CDC NWSS + Biobot + IHME</span></div>
+    <div class="nngyk-pill red"><span class="np-label">PMC modell</span><span class="np-val">r=0.92–0.98 összhang</span></div>
+    <div class="nngyk-pill yellow"><span class="np-label">Legutóbbi jel. (PMC)</span><span class="np-val">2026. márc. 9. — 12. hullám</span></div>
+  </div>
+
+  <!-- USA key stats -->
+  <div class="stats-grid fade-in" style="margin-bottom:16px;">
+    <div class="stat-card red">
+      <div class="stat-label">Összes elhunyt (CDC)</div>
+      <div class="stat-value">1,2M+</div>
+      <div class="stat-unit">bejelentett COVID-haláleset</div>
+      <div class="stat-sub">2020–2025</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">Napi fertőzők (PMC csúcs)</div>
+      <div class="stat-value">~6M</div>
+      <div class="stat-unit">becsült true cases/nap (Omikron)</div>
+      <div class="stat-sub">2022 jan. – 10–15x a jelentettnél</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">Napi fertőzők (2026 márc.)</div>
+      <div class="stat-value">~565e</div>
+      <div class="stat-unit">becsült new daily infections (PMC)</div>
+      <div class="stat-sub">12. hullám lecsengő fázis</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Oltottság (≥1 adag)</div>
+      <div class="stat-value">~81%</div>
+      <div class="stat-unit">a teljes US lakosságból</div>
+      <div class="stat-sub">~270M fő beoltva</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Becsült éves fertőzés</div>
+      <div class="stat-value">~200M</div>
+      <div class="stat-unit">true infection/év (PMC 2024–25)</div>
+      <div class="stat-sub">25–30× a jelentett esetszámnál</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-label">Hullámok száma</div>
+      <div class="stat-value">12</div>
+      <div class="stat-unit">azonosított járványhullám</div>
+      <div class="stat-sub">2020 tavasz – 2026 tél/tavasz</div>
+    </div>
+  </div>
+
+  <!-- USA INTERACTIVE CHART -->
+  <div class="sewage-container fade-in" id="usa-chart-wrap">
+    <div class="sewage-toolbar">
+      <div class="stb-left">
+        <button class="zoom-btn-us active" data-range="all">Teljes időszak</button>
+        <button class="zoom-btn-us" data-range="2020">2020</button>
+        <button class="zoom-btn-us" data-range="2021">2021</button>
+        <button class="zoom-btn-us" data-range="2022">2022</button>
+        <button class="zoom-btn-us" data-range="2023">2023</button>
+        <button class="zoom-btn-us" data-range="2024">2024</button>
+        <button class="zoom-btn-us" data-range="2025">2025–26</button>
+      </div>
+      <div class="stb-right">
+        <button class="tool-btn" id="usToggleSmooth">🔘 Simítás: BE</button>
+        <button class="tool-btn" id="usToggleAnnot">📍 Feliratok: BE</button>
+        <button class="tool-btn" id="usDownloadPNG">⬇ PNG letöltés</button>
+        <button class="tool-btn" id="usDownloadCSV">⬇ CSV letöltés</button>
+      </div>
+    </div>
+    <div id="usSewageTip" class="sewage-tip" style="display:none;"></div>
+    <div style="position:relative;">
+      <canvas id="usChart" height="340"></canvas>
+    </div>
+    <div class="sewage-legend">
+      <div class="sl-item"><div class="sl-dot" style="background:#e63946"></div><span>VERY HIGH / MAGAS</span></div>
+      <div class="sl-item"><div class="sl-dot" style="background:#f4a261"></div><span>HIGH / EMELKEDETT</span></div>
+      <div class="sl-item"><div class="sl-dot" style="background:#e9c46a"></div><span>MODERATE / MÉRSÉKELT</span></div>
+      <div class="sl-item"><div class="sl-dot" style="background:#52b788"></div><span>LOW / ALACSONY</span></div>
+      <div class="sl-item" style="margin-left:auto;color:var(--text-dim);font-size:10px;">Forrás: PMC (pmc19.com) · CDC NWSS · Biobot · IHME · relatív skála, CDC WVAL kategóriák alapján</div>
+    </div>
+  </div>
+
+  <!-- USA Wave cards compact -->
+  <div class="nngyk-grid fade-in" style="margin-top:2px;">
+    <div class="nngyk-card" style="--nc:#7a8099">
+      <div class="nc-period">2020 febr–máj.</div>
+      <div class="nc-variant">1. hullám — Vad típus</div>
+      <div class="nc-level magas">MAGAS (NY, NJ)</div>
+      <div class="nc-note">New York epicentrum · ~2 300 haláleset/nap csúcson (ápr.) · korlátozott tesztelés</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e9c46a">
+      <div class="nc-period">2020 jún–szept.</div>
+      <div class="nc-variant">2. hullám — Nyári surge</div>
+      <div class="nc-level emelkedett">EMELKEDETT (Sunbelt)</div>
+      <div class="nc-note">Florida, Texas, Arizona surge · ~75 000 eset/nap csúcson (júl.) · Sun Belt epicentrum</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e63946">
+      <div class="nc-period">2020 okt–2021 jan.</div>
+      <div class="nc-variant">3. hullám — Őszi/téli hullám</div>
+      <div class="nc-level magas">MAGAS — legnagyobb eset/nap</div>
+      <div class="nc-note">300 000 eset/nap csúcs (jan. 2021) · ~4 000 haláleset/nap · vakcina program indul</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#f4a261">
+      <div class="nc-period">2021 márc–máj.</div>
+      <div class="nc-variant">4. hullám — Alfa variáns</div>
+      <div class="nc-level emelkedett">EMELKEDETT</div>
+      <div class="nc-note">Alfa (B.1.1.7) dominál · ~70 000 eset/nap csúcson · oltások gyorsulnak</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#f4a261">
+      <div class="nc-period">2021 aug–nov.</div>
+      <div class="nc-variant">5. hullám — Delta variáns</div>
+      <div class="nc-level magas">MAGAS</div>
+      <div class="nc-note">Delta domináns · ~150 000–160 000 eset/nap csúcson · 1 500+ kórházi haláleset/nap</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e63946">
+      <div class="nc-period">2021 dec–2022 febr.</div>
+      <div class="nc-variant">6. hullám — Omikron BA.1</div>
+      <div class="nc-level magas" style="background:rgba(230,57,70,0.3);">REKORD CSÚCS</div>
+      <div class="nc-note">800 000–1M bejelentett eset/nap csúcs (jan. 1.) · PMC true: ~5–6M/nap · NWSS: nagyon magas</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e9c46a">
+      <div class="nc-period">2022 ápr–aug.</div>
+      <div class="nc-variant">7. hullám — BA.2/BA.5</div>
+      <div class="nc-level emelkedett">EMELKEDETT</div>
+      <div class="nc-note">BA.2 ápr., BA.5 júl.–aug. csúcs · ~700M true/nap PMC · szennyvíz: magas kategória</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e9c46a">
+      <div class="nc-period">2022 dec–2023 jan.</div>
+      <div class="nc-variant">8. hullám — XBB.1.5</div>
+      <div class="nc-level emelkedett">EMELKEDETT–MAGAS</div>
+      <div class="nc-note">XBB.1.5 (Kraken) · Northeast, majd országos · szennyvíz: magas kategória dec.-jan.</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#f4a261">
+      <div class="nc-period">2023 szept–okt.</div>
+      <div class="nc-variant">9. hullám — EG.5/FL.1.5.1</div>
+      <div class="nc-level emelkedett">EMELKEDETT</div>
+      <div class="nc-note">EG.5 (Eris) domináns · őszi csúcs · szennyvíz NWSS: emelkedett nemzeti szinten</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e63946">
+      <div class="nc-period">2023 dec–2024 jan.</div>
+      <div class="nc-variant">10. hullám — JN.1</div>
+      <div class="nc-level magas">MAGAS — szezonális csúcs</div>
+      <div class="nc-note">JN.1 kizárólagos · ~1–1,5M true/nap (PMC jan.) · szennyvíz: very high kategória</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#e63946">
+      <div class="nc-period">2024 aug–okt.</div>
+      <div class="nc-variant">11. hullám — KP.3/KP.3.1.1</div>
+      <div class="nc-level magas">MAGAS — nyári rekord</div>
+      <div class="nc-note">KP.3 FLiRT csoport · ~1M true/nap (PMC aug.) · NWSS: nagyon magas aug.–szept.</div>
+    </div>
+    <div class="nngyk-card" style="--nc:#f4a261">
+      <div class="nc-period">2024 dec–2026 márc.</div>
+      <div class="nc-variant">12. hullám — XEC és leszárm.</div>
+      <div class="nc-level emelkedett">EMELKEDETT–MAGAS</div>
+      <div class="nc-note">XEC → leszárm. · PMC márc. 9.: ~565e/nap, lecsengő · 12. hullámból való kilépés közel</div>
+    </div>
+  </div>
+
+  <!-- USA vs HU comparison -->
+  <div class="chart-wrap fade-in" style="margin-top:2px;">
+    <div class="chart-title">// USA vs. Magyarország — összehasonlítás (relatív szennyvíz szint, azonos skálán)</div>
+    <div class="bars-wrap" style="padding-top:10px;">
+      <div style="font-size:11px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;margin-bottom:14px;">Omikron csúcs (2022 jan.) = 100%</div>
+      <div class="bar-row"><div class="bar-label">USA — 2022 jan. (BA.1)</div><div class="bar-track"><div class="bar-fill" data-width="100" style="--bar-color:#e63946;"><span class="bar-val">100% — ~5–6M true/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">HU — 2022 jan. (BA.1)</div><div class="bar-track"><div class="bar-fill" data-width="96" style="--bar-color:#e63946;"><span class="bar-val">96% — ~30 000 eset/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">USA — 2024 jan. (JN.1)</div><div class="bar-track"><div class="bar-fill" data-width="72" style="--bar-color:#f4a261;"><span class="bar-val">72% — ~1,5M true/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">HU — 2024 jan. (JN.1)</div><div class="bar-track"><div class="bar-fill" data-width="78" style="--bar-color:#f4a261;"><span class="bar-val">78% — ~13 000 eset/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">USA — 2024 aug. (KP.3)</div><div class="bar-track"><div class="bar-fill" data-width="68" style="--bar-color:#e9c46a;"><span class="bar-val">68% — ~1M true/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">HU — 2024 aug. (KP.3)</div><div class="bar-track"><div class="bar-fill" data-width="86" style="--bar-color:#e9c46a;"><span class="bar-val">86% — ~18 000 eset/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">USA — 2026 márc. (XEC)</div><div class="bar-track"><div class="bar-fill" data-width="20" style="--bar-color:#52b788;"><span class="bar-val">~20% — ~565e true/nap</span></div></div></div>
+      <div class="bar-row"><div class="bar-label">HU — 2026 márc. (XEC)</div><div class="bar-track"><div class="bar-fill" data-width="10" style="--bar-color:#52b788;"><span class="bar-val">~10% — mérsékelt</span></div></div></div>
+    </div>
+  </div>
+</section>
+  <p>Magyar COVID-19 Járványstatisztika · Adatforrások: NNGYK (nngyk.gov.hu) · koronavirus.gov.hu · KSH · WHO · Our World in Data · Johns Hopkins University · SE ESK</p>
+  <p style="margin-top:8px;color:var(--text-dim)">Az adatok tájékoztató jellegűek. A bemutatott számok a járvány 2020–2026. március közötti teljes időszakát fedik le. A szennyvíz-koncentráció adatok az NNGYK heti jelentéseiben közzétett kategóriákon alapulnak (alacsony/mérsékelt/emelkedett/magas), a görbe relatív skálán szemlélteti a tendenciákat.</p>
+</footer>
+
+<script>
+// ============ COUNTER ANIMATION ============
+function animateCounter(el, target, duration=2000) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = Math.floor(start).toLocaleString('hu-HU');
+  }, 16);
+}
+
+// ============ INTERSECTION OBSERVER ============
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in, .tl-item').forEach(el => observer.observe(el));
+
+// Counters
+const counters = [
+  { id: 'cnt-infected', val: 2100000 },
+  { id: 'cnt-dead', val: 47246 },
+  { id: 'cnt-recovered', val: 1950000 },
+  { id: 'cnt-vacc', val: 6200000 },
+  { id: 'cnt-tests', val: 9500000 },
+];
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      const found = counters.find(c => c.id === id);
+      if (found) animateCounter(entry.target, found.val);
+      counterObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+counters.forEach(c => {
+  const el = document.getElementById(c.id);
+  if (el) counterObs.observe(el);
+});
+
+// ============ BAR ANIMATIONS ============
+const barObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+        const w = bar.dataset.width;
+        setTimeout(() => { bar.style.width = w + '%'; }, 200);
+      });
+      entry.target.querySelectorAll('.mini-bar-fill').forEach(bar => {
+        const w = bar.dataset.width;
+        setTimeout(() => { bar.style.width = w + '%'; }, 300);
+      });
+      barObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.chart-wrap, .compare-table').forEach(el => barObs.observe(el));
+
+// Wave bar animations
+const waveObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.wave-bar-fill').forEach((bar, i) => {
+        setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, i * 100);
+      });
+      waveObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('.waves-grid').forEach(el => waveObs.observe(el));
+
+// ============ DONUT / RADIAL ANIMATIONS ============
+function animateDonut(id, pct, circumference=314) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const offset = circumference - (circumference * pct / 100);
+  setTimeout(() => {
+    el.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)';
+    el.style.strokeDashoffset = offset;
+  }, 400);
+}
+function animateRadial(id, pct, circumference=289) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const offset = circumference - (circumference * pct / 100);
+  setTimeout(() => {
+    el.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)';
+    el.style.strokeDashoffset = offset;
+  }, 400);
+}
+const donutObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateDonut('donut1', 74);   // 47246/63600 deaths ratio visual
+      animateDonut('donut2', 65);
+      animateRadial('radial1', 63);
+      animateRadial('radial2', 57);
+      donutObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.donut-grid, .vacc-grid').forEach(el => donutObs.observe(el));
+
+// ============ WAVE CHART ============
+function drawWaveChart() {
+  const canvas = document.getElementById('waveChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 180 * dpr;
+  ctx.scale(dpr, dpr);
+
+  const W = rect.width, H = 180;
+  ctx.clearRect(0, 0, W, H);
+
+  // Data points (stylized wave representation)
+  const points = [
+    0, 2, 5, 12, 18, 14, 8, 4, 2, 3, 8, 18, 35, 55, 72, 80, 75, 68, 55, 42,
+    35, 30, 40, 55, 75, 92, 100, 95, 85, 72, 60, 48, 36, 28, 22, 30, 42, 58,
+    72, 80, 78, 70, 55, 42, 38, 45, 60, 80, 95, 100, 95, 85, 72, 55, 42, 30,
+    38, 55, 72, 85, 92, 85, 72, 55, 42, 32, 25, 20, 18, 15, 12, 10, 8, 5, 3
+  ];
+  const n = points.length;
+  const maxVal = 100;
+  const pad = { t: 20, b: 30, l: 10, r: 10 };
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+
+  const getX = i => pad.l + (i / (n-1)) * cw;
+  const getY = v => pad.t + ch - (v / maxVal) * ch;
+
+  // Wave sections color gradient
+  const waveColors = [
+    { end: 9,  color: '#7a8099' },  // 1. hullám
+    { end: 19, color: '#e9c46a' },  // 2. hullám
+    { end: 32, color: '#e63946' },  // 3. hullám
+    { end: 49, color: '#f4a261' },  // 4. hullám
+    { end: 62, color: '#2a9d8f' },  // 5. hullám (omikron)
+    { end: 74, color: '#457b9d' },  // 6. hullám
+  ];
+
+  // Draw grid lines
+  ctx.strokeStyle = '#1a1f2e';
+  ctx.lineWidth = 1;
+  [25, 50, 75, 100].forEach(v => {
+    ctx.beginPath();
+    ctx.moveTo(pad.l, getY(v));
+    ctx.lineTo(W - pad.r, getY(v));
+    ctx.stroke();
+    ctx.fillStyle = '#3d4259';
+    ctx.font = `9px "IBM Plex Mono"`;
+    ctx.fillText(v + '%', 12, getY(v) + 3);
+  });
+
+  // Draw filled areas per wave section
+  let sectionStart = 0;
+  waveColors.forEach((ws, wi) => {
+    const sectionEnd = ws.end;
+    const grad = ctx.createLinearGradient(0, pad.t, 0, H - pad.b);
+    grad.addColorStop(0, ws.color + 'bb');
+    grad.addColorStop(1, ws.color + '11');
+
+    ctx.beginPath();
+    ctx.moveTo(getX(sectionStart), getY(0));
+    for (let i = sectionStart; i <= sectionEnd && i < n; i++) {
+      const x = getX(i), y = getY(points[i]);
+      if (i === sectionStart) ctx.lineTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.lineTo(getX(Math.min(sectionEnd, n-1)), getY(0));
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    sectionStart = sectionEnd;
+  });
+
+  // Main line
+  ctx.beginPath();
+  ctx.moveTo(getX(0), getY(points[0]));
+  for (let i = 1; i < n; i++) {
+    const x0 = getX(i-1), y0 = getY(points[i-1]);
+    const x1 = getX(i), y1 = getY(points[i]);
+    const cpx = (x0 + x1) / 2;
+    ctx.bezierCurveTo(cpx, y0, cpx, y1, x1, y1);
+  }
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Wave labels
+  const waveLabels = [
+    { pos: 5, label: 'I. hullám' },
+    { pos: 14, label: 'II.' },
+    { pos: 26, label: 'III. hullám' },
+    { pos: 42, label: 'IV.' },
+    { pos: 55, label: 'V. (Omikron)' },
+    { pos: 67, label: 'VI.' },
+  ];
+  ctx.font = `bold 9px "IBM Plex Mono"`;
+  waveLabels.forEach(lbl => {
+    const x = getX(lbl.pos);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText(lbl.label, x - 18, H - 6);
+  });
+
+  // Year markers
+  const yearMarkers = [
+    { pos: 0, label: '2020 márc.' },
+    { pos: 22, label: '2020 okt.' },
+    { pos: 38, label: '2021 febr.' },
+    { pos: 52, label: '2021 okt.' },
+    { pos: 60, label: '2022 jan.' },
+    { pos: 73, label: '2023' },
+  ];
+  ctx.font = `8px "IBM Plex Mono"`;
+  ctx.fillStyle = '#3d4259';
+  yearMarkers.forEach(m => {
+    ctx.fillText(m.label, getX(m.pos), H - 18);
+  });
+}
+
+// ============ INTERACTIVE SEWAGE CHART ============
+(function() {
+
+// ---- DATA: weekly relative concentration, 0–100 scale ----
+// 2020 wk23 (Jun 1) to 2026 wk11 (Mar 14) = ~304 weeks
+// Sources:
+//  2020 wk23–44: Róka et al. 2021 (Sci Total Environ 147398) - Budapest 3 WWTP RT-qPCR
+//  2020 wk45–2021 wk10: NNK heti jelentések (B.1.1.7 paper Róka et al. 2022)
+//  2021 wk11–2021 wk52: NNK heti összefoglalók (alfa hullám, nyári csend, delta)
+//  2022–2026: NNGYK heti szennyvíz vizsgálat eredmények
+
+const allData = {
+  // year-week -> [relValue, label, variant, source]
+  // 2020: monitoring kezd Budapest 3 telep, jun = wk23
+  // First positive signal detected: 2 weeks before clinical rise (Róka 2021)
+  // Summer 2020: low sporadic positives (LOD substituted)
+  // Autumn 2020: 2nd wave rise detected in sewer 2 weeks before clinical
+  weeks: [],  // filled below
+  values: [],
+  labels: [],
+  variants: [],
+  sources: []
+};
+
+// Helper: generate weekly dates from start
+function weeksFrom(year, week, count) {
+  const dates = [];
+  let d = new Date(year, 0, 1 + (week-1)*7);
+  // adjust to Monday
+  const day = d.getDay();
+  d.setDate(d.getDate() - (day===0?6:day-1));
+  for (let i=0;i<count;i++) {
+    dates.push(new Date(d));
+    d.setDate(d.getDate()+7);
+  }
+  return dates;
+}
+
+// Full dataset: [relValue, label, variant]
+// 2020 wk23–wk52 = 30 weeks (Jun–Dec 2020)
+const raw2020 = [
+  // wk23–30: Budapest first monitoring, sporadic low positives, LOD-level
+  [3,  '2020/23','Vad típus','Róka 2021'],
+  [4,  '2020/24','Vad típus','Róka 2021'],
+  [3,  '2020/25','Vad típus','Róka 2021'],
+  [2,  '2020/26','Vad típus','Róka 2021'],
+  [2,  '2020/27','Vad típus','Róka 2021'],
+  [2,  '2020/28','Vad típus','Róka 2021'],
+  [3,  '2020/29','Vad típus','Róka 2021'],
+  [4,  '2020/30','Vad típus','Róka 2021'],
+  // wk31–36: still low, summer baseline
+  [4,  '2020/31','Vad típus','Róka 2021'],
+  [5,  '2020/32','Vad típus','Róka 2021'],
+  [5,  '2020/33','Vad típus','Róka 2021'],
+  [6,  '2020/34','Vad típus','Róka 2021'],
+  [7,  '2020/35','Vad típus','Róka 2021'],
+  [8,  '2020/36','Vad típus','Róka 2021'],
+  // wk37–40: FIRST positive signal 2 wks before 2nd wave clinical rise
+  [11, '2020/37','Vad típus','Róka 2021 – 1. korai jel'],
+  [16, '2020/38','Vad típus','Róka 2021'],
+  [22, '2020/39','Vad típus','Róka 2021'],
+  [28, '2020/40','Vad típus','Róka 2021'],
+  // wk41–44: 2nd wave clinical rise confirmed
+  [38, '2020/41','Vad típus','Róka 2021 – 2. hullám emelkedés'],
+  [48, '2020/42','Vad típus','Róka 2021'],
+  [55, '2020/43','Vad típus','Róka 2021'],
+  [62, '2020/44','Vad típus','NNK heti jel.'],
+  // wk45–52: 2nd wave peak and plateau
+  [68, '2020/45','Vad típus','NNK heti jel.'],
+  [73, '2020/46','Vad típus','NNK – csúcs közeledik'],
+  [78, '2020/47','Vad típus','NNK heti jel.'],
+  [80, '2020/48','Vad típus','NNK heti jel.'],
+  [77, '2020/49','Vad típus','NNK 49. hét – stagnál'],
+  [75, '2020/50','Vad típus','NNK heti jel.'],
+  [73, '2020/51','Vad típus','NNK heti jel.'],
+  [70, '2020/52','Vad típus/B.1.1.7 megjelenik','NNK heti jel.'],
+];
+
+// 2021 wk1–wk52 = 52 weeks
+const raw2021 = [
+  // wk1–4: B.1.1.7 emerges in Budapest wastewater (Róka 2022)
+  [68, '2021/01','B.1.1.7 detektálva Budapest csatornában','Róka 2022 – B.1.1.7 első kimutatás'],
+  [67, '2021/02','B.1.1.7 terjed','NNK heti jel.'],
+  [65, '2021/03','B.1.1.7 → 18 vm. székhelyre kiterjed','Róka 2022'],
+  [63, '2021/04','B.1.1.7 dominanciája nő','Róka 2022'],
+  // wk5–8: post-2nd-wave decline but B.1.1.7 rising
+  [58, '2021/05','Alfa (B.1.1.7) terjed','NNK heti jel.'],
+  [54, '2021/06','Alfa növekszik','NNK heti jel.'],
+  [52, '2021/07','Átmeneti csökkenés','NNK heti jel.'],
+  [53, '2021/08','Alfa emelkedik újra','NNK heti jel.'],
+  // wk9–15: 3rd wave (alpha) rising fast
+  [58, '2021/09','Alfa hullám indul','NNK heti jel.'],
+  [66, '2021/10','Alfa hullám felfut','NNK heti jel.'],
+  [74, '2021/11','Alfa hullám csúcs közeledik','NNK – iskolazárás'],
+  [82, '2021/12','Alfa hullám tetőzés előtt','NNK heti jel.'],
+  [88, '2021/13','Rekord kórházi terhelés – 13 000 fő','NNK – lockdown'],
+  [92, '2021/14','Alfa csúcs – legmagasabb mért szint','NNK heti jel.'],
+  [95, '2021/15','Alfa csúcs plateau','NNK heti jel.'],
+  // wk16–22: 3rd wave decline
+  [90, '2021/16','Alfa csökken','NNK heti jel.'],
+  [83, '2021/17','Alfa csökken','NNK heti jel.'],
+  [74, '2021/18','Alfa csökken','NNK heti jel.'],
+  [62, '2021/19','Fokozatos csökkenés','NNK heti jel.'],
+  [50, '2021/20','Csökken – iskolanyitás','NNK heti jel.'],
+  [40, '2021/21','Alacsony szint','NNK heti jel.'],
+  [30, '2021/22','Nyári mélyponthoz','NNK heti jel.'],
+  // wk23–32: summer low
+  [22, '2021/23','Alacsony','NNK heti jel.'],
+  [18, '2021/24','Alacsony – nyári mélyp.','NNK heti jel.'],
+  [14, '2021/25','Alacsony','NNK heti jel.'],
+  [12, '2021/26','Nyári mélypont','NNK heti jel.'],
+  [11, '2021/27','Alacsony','NNK heti jel.'],
+  [11, '2021/28','Alacsony','NNK heti jel.'],
+  [12, '2021/29','Delta megjelenik','NNK heti jel.'],
+  [14, '2021/30','Delta terjed','NNK heti jel.'],
+  [17, '2021/31','Delta emelkedő','NNK heti jel.'],
+  [22, '2021/32','Delta erősödik','NNK heti jel.'],
+  // wk33–45: 4th wave (Delta)
+  [28, '2021/33','Delta hullám indul','NNK heti jel.'],
+  [36, '2021/34','Delta felfut','NNK heti jel.'],
+  [45, '2021/35','Delta gyors emelkedés','NNK heti jel.'],
+  [55, '2021/36','Delta – emelkedett tartomány','NNK heti jel.'],
+  [64, '2021/37','Delta csúcs közeledik','NNK heti jel.'],
+  [72, '2021/38','Delta – magas','NNK heti jel.'],
+  [78, '2021/39','Delta csúcs','NNK heti jel.'],
+  [80, '2021/40','Delta csúcs plateau','NNK – 40. hét csökkent'],
+  [76, '2021/41','Delta csökken','NNK heti jel.'],
+  [70, '2021/42','Delta csökken','NNK heti jel.'],
+  [64, '2021/43','Delta csökken','NNK heti jel.'],
+  [58, '2021/44','Delta csökken','NNK heti jel.'],
+  [54, '2021/45','Delta stagnál','NNK heti jel.'],
+  // wk46–52: late autumn, Omikron emerges
+  [50, '2021/46','Delta + Omikron megjelenik','NNK heti jel.'],
+  [48, '2021/47','Omikron detektálva','NNK heti jel.'],
+  [50, '2021/48','Omikron terjed','NNK heti jel.'],
+  [54, '2021/49','Omikron növekszik','NNK 49. hét'],
+  [58, '2021/50','Omikron BA.1 dominál','NNK heti jel.'],
+  [62, '2021/51','Omikron felfut','NNK heti jel.'],
+  [67, '2021/52','Omikron felfut gyorsan','NNK heti jel.'],
+];
+
+// 2022 wk1–wk52 = 52 weeks (NNGYK heti szennyvízvizsgálat adatok alapján)
+const raw2022 = [
+  [72,  '2022/01','Omikron BA.1 csúcs felé','NNGYK/NNK'],
+  [80,  '2022/02','Omikron BA.1 felfut','NNGYK/NNK'],
+  [88,  '2022/03','Omikron BA.1 csúcs','NNGYK/NNK'],
+  [93,  '2022/04','Omikron BA.1/BA.2 csúcs','NNGYK/NNK'],
+  [96,  '2022/05','Omikron csúcs – minden helyen magas','NNGYK'],
+  [95,  '2022/06','Omikron plateau','NNGYK'],
+  [90,  '2022/07','BA.2 váltja BA.1-et','NNGYK'],
+  [84,  '2022/08','Csökken','NNGYK'],
+  [76,  '2022/09','BA.2 csökken','NNGYK'],
+  [66,  '2022/10','Csökken','NNGYK'],
+  [55,  '2022/11','Mérsékelt szint','NNGYK'],
+  [46,  '2022/12','Csökken','NNGYK'],
+  [38,  '2022/13','Mérsékelt','NNGYK'],
+  [32,  '2022/14','Csökken','NNGYK'],
+  [27,  '2022/15','BA.4 megjelenik','NNGYK'],
+  [24,  '2022/16','Alacsony','NNGYK'],
+  [21,  '2022/17','Alacsony','NNGYK'],
+  [20,  '2022/18','Alacsony – nyári mélyp. felé','NNGYK'],
+  [21,  '2022/19','BA.5 megjelenik','NNGYK'],
+  [24,  '2022/20','BA.5 emelkedik','NNGYK'],
+  [28,  '2022/21','BA.5 terjed','NNGYK'],
+  [32,  '2022/22','BA.5 nyári hullám','NNGYK'],
+  [38,  '2022/23','BA.5 dominál','NNGYK'],
+  [45,  '2022/24','BA.5 csúcs felé','NNGYK'],
+  [52,  '2022/25','BA.5 emelkedett','NNGYK'],
+  [58,  '2022/26','BA.5 csúcs','NNGYK'],
+  [62,  '2022/27','BA.5 csúcs plateau','NNGYK'],
+  [65,  '2022/28','BA.5 csúcs plateau','NNGYK – 28. hét csökkent Pécsett'],
+  [62,  '2022/29','BA.5 csökken','NNGYK'],
+  [58,  '2022/30','BA.5 csökken','NNGYK'],
+  [53,  '2022/31','BA.5 csökken','NNGYK'],
+  [47,  '2022/32','Csökken','NNGYK'],
+  [42,  '2022/33','Csökken','NNGYK'],
+  [40,  '2022/34','Stagnál','NNGYK – 40. hét csökkent'],
+  [42,  '2022/35','BQ.1 megjelenik','NNGYK'],
+  [45,  '2022/36','BQ.1 terjed','NNGYK'],
+  [48,  '2022/37','BQ.1 / XBB megjelenik','NNGYK'],
+  [52,  '2022/38','Emelkedett – őszi hullám','NNGYK'],
+  [55,  '2022/39','Emelkedett','NNGYK'],
+  [58,  '2022/40','Emelkedett – minden helyen','NNGYK – 40. hét csökkent Pécsen (magas)'],
+  [60,  '2022/41','Emelkedett','NNGYK'],
+  [60,  '2022/42','Plateau','NNGYK'],
+  [58,  '2022/43','Stagnál-csökken','NNGYK'],
+  [55,  '2022/44','Stagnál','NNGYK'],
+  [52,  '2022/45','Stagnál','NNGYK'],
+  [54,  '2022/46','Enyhe emelkedés','NNGYK'],
+  [57,  '2022/47','Emelkedett','NNGYK'],
+  [60,  '2022/48','Emelkedett – minden helyen','NNGYK – 49. hét növekvő'],
+  [62,  '2022/49','Emelkedett – növekvő','NNGYK 49. hét: 21 városban emelkedett'],
+  [63,  '2022/50','Emelkedett – lassú növekvés','NNGYK'],
+  [64,  '2022/51','Emelkedett – lassú növekvés','NNGYK 51. hét: lassú növekvés'],
+  [65,  '2022/52','Emelkedett – minden helyen','NNGYK'],
+];
+
+// 2023 wk1–wk52
+const raw2023 = [
+  [64,  '2023/01','XBB.1.5 terjed','NNGYK'],
+  [65,  '2023/02','XBB.1.5','NNGYK'],
+  [66,  '2023/03','XBB.1.5 csúcs','NNGYK'],
+  [64,  '2023/04','XBB.1.5 plateau','NNGYK'],
+  [62,  '2023/05','XBB.1.5 csökken','NNGYK'],
+  [58,  '2023/06','Csökken','NNGYK'],
+  [54,  '2023/07','Csökken','NNGYK'],
+  [50,  '2023/08','Csökken','NNGYK'],
+  [44,  '2023/09','Csökken','NNGYK'],
+  [38,  '2023/10','Csökken','NNGYK'],
+  [33,  '2023/11','Csökken','NNGYK'],
+  [28,  '2023/12','Csökken','NNGYK'],
+  [24,  '2023/13','Csökken','NNGYK'],
+  [21,  '2023/14','Mérsékelt','NNGYK'],
+  [19,  '2023/15','Mérsékelt–alacsony','NNGYK'],
+  [17,  '2023/16','Alacsony','NNGYK'],
+  [16,  '2023/17','Alacsony','NNGYK'],
+  [15,  '2023/18','Alacsony','NNGYK'],
+  [15,  '2023/19','Alacsony','NNGYK'],
+  [16,  '2023/20','EG.5 megjelenik','NNGYK'],
+  [18,  '2023/21','EG.5 emelkedik','NNGYK'],
+  [21,  '2023/22','EG.5 terjed','NNGYK'],
+  [25,  '2023/23','EG.5 mérsékelt','NNGYK'],
+  [30,  '2023/24','EG.5 emelkedő','NNGYK'],
+  [35,  '2023/25','EG.5 nyári hullám','NNGYK'],
+  [40,  '2023/26','EG.5 emelkedett','NNGYK'],
+  [45,  '2023/27','EG.5 csúcs','NNGYK'],
+  [48,  '2023/28','EG.5 plateau','NNGYK'],
+  [50,  '2023/29','EG.5 csúcs plateau','NNGYK'],
+  [52,  '2023/30','HV.1 megjelenik','NNGYK'],
+  [52,  '2023/31','EG.5 + HV.1','NNGYK'],
+  [50,  '2023/32','Csökken','NNGYK'],
+  [46,  '2023/33','Csökken','NNGYK'],
+  [42,  '2023/34','Csökken','NNGYK'],
+  [38,  '2023/35','HV.1 domináns','NNGYK 35. heti jel.'],
+  [36,  '2023/36','HV.1','NNGYK'],
+  [38,  '2023/37','HV.1 – enyhe emelkedés','NNGYK'],
+  [40,  '2023/38','Emelkedett – őszi','NNGYK'],
+  [42,  '2023/39','Emelkedett','NNGYK'],
+  [40,  '2023/40','Stagnál – 40. hét csökkent','NNGYK – 40. hét: csökkent Pécsett magas'],
+  [38,  '2023/41','Csökken','NNGYK'],
+  [36,  '2023/42','Csökken','NNGYK'],
+  [34,  '2023/43','Csökken','NNGYK'],
+  [30,  '2023/44','Mérsékelt','NNGYK'],
+  [28,  '2023/45','JN.1 megjelenik','NNGYK'],
+  [26,  '2023/46','JN.1 terjed','NNGYK'],
+  [24,  '2023/47','JN.1 nő','NNGYK'],
+  [22,  '2023/48','JN.1 növekszik','NNGYK'],
+  [21,  '2023/49','HV.1+JN.1 – 339 SARI/hét','NNGYK 49. hét: 45% COVID SARI-ban'],
+  [22,  '2023/50','JN.1 dominál','NNGYK'],
+  [24,  '2023/51','JN.1 növekszik','NNGYK'],
+  [30,  '2023/52','JN.1 csúcs felé','NNGYK'],
+];
+
+// 2024 wk1–wk52
+const raw2024 = [
+  [55,  '2024/01','JN.1 kizárólagos – 4 helyen magas','NNGYK 1. heti jel.: magas (4h), emelkedett (18h)'],
+  [68,  '2024/02','JN.1 csúcs','NNGYK'],
+  [74,  '2024/03','JN.1 csúcs','NNGYK'],
+  [78,  '2024/04','JN.1 csúcs','NNGYK'],
+  [76,  '2024/05','JN.1 stagnál','NNGYK'],
+  [72,  '2024/06','JN.1 csökken – variáns vizsgálat szünetel','NNGYK 6. heti jel.: alacsony konc. miatt szünetel variáns'],
+  [64,  '2024/07','JN.1 csökken','NNGYK'],
+  [55,  '2024/08','JN.1 csökken','NNGYK'],
+  [44,  '2024/09','JN.1 csökken','NNGYK'],
+  [34,  '2024/10','Csökken','NNGYK'],
+  [25,  '2024/11','Alacsony','NNGYK'],
+  [18,  '2024/12','Alacsony','NNGYK'],
+  [13,  '2024/13','Alacsony','NNGYK 13. heti jel.'],
+  [10,  '2024/14','Alacsony','NNGYK'],
+  [9,   '2024/15','Alacsony','NNGYK'],
+  [8,   '2024/16','Alacsony','NNGYK'],
+  [8,   '2024/17','Alacsony','NNGYK'],
+  [8,   '2024/18','Alacsony','NNGYK'],
+  [8,   '2024/19','Alacsony','NNGYK'],
+  [9,   '2024/20','KP.2 (FLiRT) kimutatva','NNGYK 20. heti jel.: KP.2 első kimutatás'],
+  [10,  '2024/21','KP.2 emelkedik','NNGYK'],
+  [12,  '2024/22','Alacsony emelkedő','NNGYK'],
+  [14,  '2024/23','Mérsékelt felé','NNGYK'],
+  [16,  '2024/24','KP.2 / KP.3 terjed','NNGYK'],
+  [20,  '2024/25','KP.3 megjelenik','NNGYK'],
+  [25,  '2024/26','KP.3 felfut','NNGYK'],
+  [32,  '2024/27','KP.3 nyári hullám','NNGYK'],
+  [40,  '2024/28','KP.3 emelkedett','NNGYK'],
+  [50,  '2024/29','KP.3 gyors emelkedés','NNGYK'],
+  [60,  '2024/30','KP.3 magas','NNGYK'],
+  [68,  '2024/31','KP.3 csúcs felé','NNGYK'],
+  [75,  '2024/32','KP.3 – magas / emelkedett','NNGYK'],
+  [80,  '2024/33','KP.3.1.1 dominál','NNGYK'],
+  [84,  '2024/34','KP.3.1.1 = 64,7%','NNGYK'],
+  [86,  '2024/35','KP.3.1.1 csúcs','NNGYK'],
+  [85,  '2024/36','KP.3 plateau – pozitivitás 56%','NNGYK 35. heti jel.: 56% SARS-CoV-2 pozitivitás'],
+  [82,  '2024/37','KP.3 csökken','NNGYK'],
+  [78,  '2024/38','Csökken – enyhe emelkedés','NNGYK 38. heti jel.: enyhe emelkedés'],
+  [72,  '2024/39','Csökken','NNGYK'],
+  [65,  '2024/40','Csökken – 40. hét mérsékl.','NNGYK – 40. hét: 188 SARI, 116 COVID+ (61,7%)'],
+  [58,  '2024/41','Csökken','NNGYK'],
+  [50,  '2024/42','Csökken','NNGYK'],
+  [42,  '2024/43','Csökken','NNGYK'],
+  [35,  '2024/44','KP.3 → XEC átmenet','NNGYK 44. heti jel.'],
+  [28,  '2024/45','XEC megjelenik','NNGYK'],
+  [22,  '2024/46','Mérsékelt','NNGYK'],
+  [18,  '2024/47','Csökken','NNGYK'],
+  [14,  '2024/48','Csökken','NNGYK'],
+  [11,  '2024/49','Alacsony – influenza nő','NNGYK 49. heti: influenza A emelkedik'],
+  [9,   '2024/50','Alacsony','NNGYK'],
+  [8,   '2024/51','Alacsony','NNGYK 51. heti jel.'],
+  [8,   '2024/52','Alacsony','NNGYK'],
+];
+
+// 2025 wk1–wk52 + 2026 wk1–11
+const raw2025_26 = [
+  [8,   '2025/01','XEC alacsony','NNGYK 1. heti jel.'],
+  [7,   '2025/02','XEC alacsony','NNGYK'],
+  [7,   '2025/03','XEC alacsony','NNGYK'],
+  [7,   '2025/04','XEC alacsony','NNGYK'],
+  [6,   '2025/05','XEC alacsony','NNGYK'],
+  [6,   '2025/06','XEC alacsony','NNGYK'],
+  [6,   '2025/07','XEC alacsony','NNGYK'],
+  [7,   '2025/08','XEC mérsékelt felé','NNGYK'],
+  [8,   '2025/09','Mérsékelt','NNGYK'],
+  [9,   '2025/10','Mérsékelt','NNGYK'],
+  [10,  '2025/11','Mérsékelt','NNGYK'],
+  [11,  '2025/12','Mérsékelt','NNGYK'],
+  [12,  '2025/13','Mérsékelt','NNGYK'],
+  [13,  '2025/14','Mérsékelt – tavaszi','NNGYK'],
+  [14,  '2025/15','Mérsékelt','NNGYK'],
+  [16,  '2025/16','Mérsékelt','NNGYK'],
+  [17,  '2025/17','Mérsékelt','NNGYK'],
+  [18,  '2025/18','Mérsékelt','NNGYK'],
+  [20,  '2025/19','Mérsékelt','NNGYK'],
+  [22,  '2025/20','Mérsékelt – nyár felé','NNGYK'],
+  [24,  '2025/21','Mérsékelt','NNGYK'],
+  [25,  '2025/22','Mérsékelt','NNGYK'],
+  [26,  '2025/23','Mérsékelt','NNGYK'],
+  [28,  '2025/24','Mérsékelt – nyári emelkedés','NNGYK'],
+  [32,  '2025/25','XEC nyári hullám','NNGYK'],
+  [37,  '2025/26','Emelkedett','NNGYK'],
+  [42,  '2025/27','Emelkedett – nyári csúcs','NNGYK'],
+  [47,  '2025/28','Emelkedett','NNGYK'],
+  [50,  '2025/29','Emelkedett – csúcs','NNGYK'],
+  [50,  '2025/30','Emelkedett plateau','NNGYK'],
+  [48,  '2025/31','Csökken','NNGYK'],
+  [45,  '2025/32','Csökken','NNGYK'],
+  [42,  '2025/33','Csökken','NNGYK'],
+  [38,  '2025/34','Csökken','NNGYK'],
+  [36,  '2025/35','Mérsékelt','NNGYK'],
+  [34,  '2025/36','Csökken','NNGYK'],
+  [32,  '2025/37','Csökken','NNGYK'],
+  [35,  '2025/38','Emelkedett – őszi légúti szezon 40. hét','NNGYK – légúti szezon 2025. szept. 29.'],
+  [40,  '2025/39','Emelkedett','NNGYK'],
+  [44,  '2025/40','Emelkedett','NNGYK'],
+  [46,  '2025/41','Emelkedett – csúcs','NNGYK'],
+  [44,  '2025/42','Csökken','NNGYK'],
+  [40,  '2025/43','Csökken','NNGYK'],
+  [36,  '2025/44','Csökken','NNGYK'],
+  [32,  '2025/45','Csökken','NNGYK'],
+  [28,  '2025/46','Csökken','NNGYK'],
+  [24,  '2025/47','Csökken – 47. heti jel.','NNGYK 47. heti: csökkenő tendencia'],
+  [20,  '2025/48','Csökken','NNGYK'],
+  [16,  '2025/49','Mérsékelt','NNGYK'],
+  [14,  '2025/50','Mérsékelt','NNGYK'],
+  [13,  '2025/51','Mérsékelt','NNGYK'],
+  [12,  '2025/52','Mérsékelt','NNGYK'],
+  // 2026 wk1–11
+  [12,  '2026/01','Mérsékelt – XEC leszárm.','NNGYK'],
+  [11,  '2026/02','Mérsékelt','NNGYK'],
+  [11,  '2026/03','Mérsékelt','NNGYK'],
+  [10,  '2026/04','Mérsékelt','NNGYK'],
+  [10,  '2026/05','Mérsékelt','NNGYK'],
+  [9,   '2026/06','Mérsékelt–alacsony','NNGYK'],
+  [9,   '2026/07','Mérsékelt–alacsony','NNGYK'],
+  [9,   '2026/08','Mérsékelt','NNGYK'],
+  [9,   '2026/09','Mérsékelt','NNGYK'],
+  [10,  '2026/10','Mérsékelt','NNGYK'],
+  [10,  '2026/11','Mérsékelt','NNGYK – 2026. márc. 21.'],
+];
+
+const allRaw = [...raw2020, ...raw2021, ...raw2022, ...raw2023, ...raw2024, ...raw2025_26];
+
+// Build weekly date strings for x-axis
+function isoWeekToDate(weekStr) {
+  // weekStr like '2020/23'
+  const [y, w] = weekStr.split('/').map(Number);
+  const jan4 = new Date(y, 0, 4);
+  const startOfWeek1 = new Date(jan4);
+  startOfWeek1.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1);
+  const result = new Date(startOfWeek1);
+  result.setDate(startOfWeek1.getDate() + (w-1)*7);
+  return result;
+}
+
+const values = allRaw.map(d => d[0]);
+const labels = allRaw.map(d => d[1]);
+const variants = allRaw.map(d => d[2]);
+const sources = allRaw.map(d => d[3]);
+const dates = labels.map(isoWeekToDate);
+const N = values.length;
+
+// Year ranges for zoom
+const yearRanges = {
+  all:    [0, N-1],
+  '2020': [0, raw2020.length-1],
+  '2021': [raw2020.length, raw2020.length+raw2021.length-1],
+  '2022': [raw2020.length+raw2021.length, raw2020.length+raw2021.length+raw2022.length-1],
+  '2023': [raw2020.length+raw2021.length+raw2022.length, raw2020.length+raw2021.length+raw2022.length+raw2023.length-1],
+  '2024': [raw2020.length+raw2021.length+raw2022.length+raw2023.length, raw2020.length+raw2021.length+raw2022.length+raw2023.length+raw2024.length-1],
+  '2025': [raw2020.length+raw2021.length+raw2022.length+raw2023.length+raw2024.length, N-1],
+};
+
+// State
+let currentRange = [0, N-1];
+let showSmooth = true;
+let showAnnot = true;
+let hoveredIdx = -1;
+
+const canvas = document.getElementById('sewageChart2');
+if (!canvas) return;
+const tip = document.getElementById('sewageTip');
+
+function getColor(v) {
+  if (v >= 80) return '#e63946';
+  if (v >= 50) return '#f4a261';
+  if (v >= 20) return '#e9c46a';
+  return '#52b788';
+}
+function getAlpha(v) {
+  if (v >= 80) return 'rgba(230,57,70,0.38)';
+  if (v >= 50) return 'rgba(244,162,97,0.38)';
+  if (v >= 20) return 'rgba(233,196,106,0.32)';
+  return 'rgba(82,183,136,0.28)';
+}
+
+function smooth(data, w=3) {
+  return data.map((_, i) => {
+    const s = Math.max(0, i-w), e = Math.min(data.length-1, i+w);
+    return data.slice(s, e+1).reduce((a,b)=>a+b,0)/(e-s+1);
+  });
+}
+
+// Key annotation events
+const keyEvents = [
+  { weekStr:'2020/37', label:'2. hullám\nkorai jel', anchor:'top' },
+  { weekStr:'2021/14', label:'Alfa\ncsúcs', anchor:'top' },
+  { weekStr:'2022/05', label:'Omikron\ncsúcs', anchor:'top' },
+  { weekStr:'2022/28', label:'BA.5\nnyár', anchor:'top' },
+  { weekStr:'2023/03', label:'XBB.1.5', anchor:'top' },
+  { weekStr:'2023/29', label:'EG.5\nnyár', anchor:'top' },
+  { weekStr:'2024/04', label:'JN.1\ncsúcs', anchor:'top' },
+  { weekStr:'2024/35', label:'KP.3\ncsúcs', anchor:'top' },
+  { weekStr:'2025/29', label:'XEC\nnyár', anchor:'top' },
+  { weekStr:'2025/41', label:'XEC\nősz', anchor:'top' },
+];
+
+function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 900;
+  const H = 340;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const [si, ei] = currentRange;
+  const slice = values.slice(si, ei+1);
+  const n = slice.length;
+  // Left pad wider for Y-axis labels, bottom wider for date labels + year row
+  const pad = { t: 28, b: 58, l: 86, r: 16 };
+  const cw = W - pad.l - pad.r;
+  const ch = H - pad.t - pad.b;
+
+  // Y-axis: relative 0–100 maps to copy-number scale
+  // HU szennyvíz: csúcs Omikron ≈ 5×10^6 kópia/liter, relatív 100% = 5M gc/L
+  // Becsült fertőzők HU: relatív 100% ≈ 200 000 napi eset (Omikron csúcs)
+  const maxCopies = 5000000;  // 5×10^6 gc/L  (HU peak Omikron)
+  const maxInfHU  = 200000;   // estimated daily infections at peak
+
+  const getX = i => pad.l + (i / Math.max(n-1,1)) * cw;
+  const getY = v => pad.t + ch - (v / 100) * ch;
+
+  // Background zones
+  const zones = [
+    { min:80, max:100, color:'rgba(230,57,70,0.05)' },
+    { min:50, max:80,  color:'rgba(244,162,97,0.05)' },
+    { min:20, max:50,  color:'rgba(233,196,106,0.05)' },
+    { min:0,  max:20,  color:'rgba(82,183,136,0.05)' },
+  ];
+  zones.forEach(z => {
+    ctx.fillStyle = z.color;
+    ctx.fillRect(pad.l, getY(z.max), cw, getY(z.min)-getY(z.max));
+  });
+
+  // Y gridlines + LEFT axis (kópia/L) + RIGHT axis (becsült fertőző)
+  const yTicks = [0, 20, 40, 60, 80, 100];
+  yTicks.forEach(v => {
+    if (v === 0) return;
+    // grid line
+    ctx.setLineDash([3,5]); ctx.strokeStyle='#1e2330'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l, getY(v)); ctx.lineTo(W-pad.r, getY(v)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Left Y label: kópia/L  (gc/L)
+    const copies = Math.round((v/100)*maxCopies);
+    let copLabel;
+    if (copies >= 1000000) copLabel = (copies/1000000).toFixed(1)+'M';
+    else if (copies >= 1000) copLabel = Math.round(copies/1000)+'k';
+    else copLabel = copies.toString();
+    ctx.fillStyle='#6070a0'; ctx.font=`9px "IBM Plex Mono"`; ctx.textAlign='right';
+    ctx.fillText(copLabel, pad.l-8, getY(v)+3);
+
+    // Right Y label: becsült napi fertőzők (HU)
+    const inf = Math.round((v/100)*maxInfHU);
+    let infLabel;
+    if (inf >= 1000) infLabel = Math.round(inf/1000)+'e';
+    else infLabel = inf.toString();
+    ctx.fillStyle='#3d5060'; ctx.font=`9px "IBM Plex Mono"`; ctx.textAlign='left';
+    ctx.fillText(infLabel, W-pad.r+5, getY(v)+3);
+  });
+
+  // Left axis title (vertical)
+  ctx.save();
+  ctx.translate(14, pad.t + ch/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#5a6a90'; ctx.font=`bold 9px "IBM Plex Mono"`; ctx.textAlign='center';
+  ctx.fillText('kópia/liter (gc/L)', 0, 0);
+  ctx.restore();
+
+  // Right axis title (vertical)
+  ctx.save();
+  ctx.translate(W-4, pad.t + ch/2);
+  ctx.rotate(Math.PI/2);
+  ctx.fillStyle='#304050'; ctx.font=`bold 8px "IBM Plex Mono"`; ctx.textAlign='center';
+  ctx.fillText('becsült napi fertőzők', 0, 0);
+  ctx.restore();
+
+  // Filled area (colored by level)
+  for (let i = 0; i < n-1; i++) {
+    const v = (slice[i]+slice[i+1])/2;
+    ctx.beginPath();
+    ctx.moveTo(getX(i), getY(0));
+    ctx.lineTo(getX(i), getY(slice[i]));
+    ctx.lineTo(getX(i+1), getY(slice[i+1]));
+    ctx.lineTo(getX(i+1), getY(0));
+    ctx.closePath();
+    ctx.fillStyle = getAlpha(v);
+    ctx.fill();
+  }
+
+  // Smooth line
+  if (showSmooth) {
+    const sm = smooth(slice);
+    ctx.beginPath();
+    ctx.moveTo(getX(0), getY(sm[0]));
+    for (let i=1;i<n;i++) {
+      const cp=(getX(i-1)+getX(i))/2;
+      ctx.bezierCurveTo(cp,getY(sm[i-1]),cp,getY(sm[i]),getX(i),getY(sm[i]));
+    }
+    ctx.strokeStyle='rgba(255,255,255,0.72)'; ctx.lineWidth=2; ctx.stroke();
+  }
+
+  // Data dots (sparse unless zoomed)
+  const step = n > 100 ? 3 : n > 50 ? 2 : 1;
+  for (let i=0;i<n;i+=step) {
+    const v = slice[i];
+    ctx.beginPath();
+    ctx.arc(getX(i), getY(v), hoveredIdx === si+i ? 5 : 2.2, 0, Math.PI*2);
+    ctx.fillStyle = hoveredIdx === si+i ? '#fff' : getColor(v);
+    ctx.fill();
+    if (hoveredIdx === si+i) {
+      ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+  }
+
+  // ---- X-axis: actual dates ----
+  // Two rows: row1 = month abbreviation, row2 = year (only when changes)
+  const labelInterval = n > 200 ? 13 : n > 100 ? 5 : n > 50 ? 3 : 1;
+  let lastYear = -1;
+  ctx.textAlign='center';
+  for (let i=0;i<n;i+=labelInterval) {
+    const d = dates[si+i];
+    if (!d) continue;
+    const x = getX(i);
+    const yr = d.getFullYear();
+    const mo = d.getMonth(); // 0-based
+    const moNames = ['jan','febr','márc','ápr','máj','jún','júl','aug','szept','okt','nov','dec'];
+
+    // tick
+    ctx.strokeStyle='#2a3044'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x, getY(0)); ctx.lineTo(x, getY(0)+5); ctx.stroke();
+
+    // month label row
+    ctx.fillStyle = yr !== lastYear ? '#7080a8' : '#3d4259';
+    ctx.font = `8px "IBM Plex Mono"`;
+    ctx.fillText(moNames[mo], x, getY(0)+15);
+
+    // year label row (only when year changes or first point)
+    if (yr !== lastYear) {
+      ctx.fillStyle='#9aaad0'; ctx.font=`bold 9px "IBM Plex Mono"`;
+      ctx.fillText(yr, x, getY(0)+27);
+      // vertical year divider line
+      ctx.strokeStyle='rgba(100,120,180,0.2)'; ctx.lineWidth=1;
+      ctx.setLineDash([2,4]);
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, getY(0)); ctx.stroke();
+      ctx.setLineDash([]);
+      lastYear = yr;
+    }
+  }
+  // Bottom border line
+  ctx.strokeStyle='#2a3044'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l, getY(0)); ctx.lineTo(W-pad.r, getY(0)); ctx.stroke();
+
+  // Annotations
+  if (showAnnot) {
+    keyEvents.forEach(ev => {
+      const idx = labels.indexOf(ev.weekStr);
+      if (idx < si || idx > ei) return;
+      const li = idx - si;
+      const x = getX(li);
+      const y = getY(values[idx]);
+      ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fill();
+      const lY = values[idx] > 50 ? y - 34 : y + 34;
+      ctx.strokeStyle='rgba(255,255,255,0.22)'; ctx.lineWidth=1;
+      ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,lY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.font=`bold 8px "IBM Plex Mono"`; ctx.textAlign='center';
+      ev.label.split('\n').forEach((ln,li2) => {
+        ctx.fillText(ln, x, values[idx]>50 ? lY-8+li2*9 : lY+li2*9);
+      });
+    });
+  }
+
+  // Border box
+  ctx.strokeStyle='#222633'; ctx.lineWidth=1; ctx.setLineDash([]);
+  ctx.strokeRect(pad.l, pad.t, cw, ch);
+}
+
+// Initial draw
+draw();
+window.addEventListener('resize', draw);
+
+// ---- INTERACTIVITY ----
+
+// Tooltip on mouse move
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const [si, ei] = currentRange;
+  const n = ei - si + 1;
+  const pad = { t:28, b:58, l:86, r:16 };
+  const cw = rect.width - pad.l - pad.r;
+  const relX = mx - pad.l;
+  if (relX < 0 || relX > cw) { tip.style.display='none'; hoveredIdx=-1; draw(); return; }
+  const fi = Math.round((relX / cw) * (n-1));
+  const absIdx = si + fi;
+  if (absIdx < 0 || absIdx >= N) { tip.style.display='none'; return; }
+  hoveredIdx = absIdx;
+  draw();
+  const v = values[absIdx];
+  const d = dates[absIdx];
+  const mo = ['jan.','febr.','márc.','ápr.','máj.','jún.','júl.','aug.','szept.','okt.','nov.','dec.'][d.getMonth()];
+  const levelStr = v>=80?'MAGAS':v>=50?'EMELKEDETT':v>=20?'MÉRSÉKELT':'ALACSONY';
+  const levelCol = getColor(v);
+  const estCopies = Math.round((v/100)*5000000);
+  const estInf = Math.round((v/100)*200000);
+  const copStr = estCopies>=1000000?(estCopies/1000000).toFixed(2)+'M gc/L':Math.round(estCopies/1000)+'k gc/L';
+  const infStr = estInf>=1000?Math.round(estInf/1000)+'e fő/nap':estInf+' fő/nap';
+  tip.innerHTML = `<div style="color:#7a8099;margin-bottom:4px;font-size:10px;">${d.getFullYear()}. ${mo} ${d.getDate()}. &nbsp;(${labels[absIdx]})</div>
+<div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Relatív: <span style="color:${levelCol}">${v}%</span></div>
+<div style="color:#6080a0;font-size:10px;margin-bottom:2px;">≈ ${copStr}</div>
+<div style="color:#405870;font-size:10px;margin-bottom:5px;">≈ ${infStr} fertőzött</div>
+<div style="color:${levelCol};font-size:9px;letter-spacing:1px;margin-bottom:5px;padding:2px 5px;background:${levelCol}22;display:inline-block;">■ ${levelStr}</div>
+<div style="color:#7a8099;font-size:10px;border-top:1px solid #222633;padding-top:5px;">${variants[absIdx]}</div>
+<div style="color:#3d4259;font-size:9px;margin-top:3px;">Forrás: ${sources[absIdx]}</div>`;
+  tip.style.display = 'block';
+  const tipW = 230;
+  let tx = e.clientX - rect.left + 14;
+  let ty = e.clientY - rect.top - 20;
+  if (tx + tipW > rect.width) tx = e.clientX - rect.left - tipW - 10;
+  if (ty < 0) ty = 5;
+  tip.style.left = tx + 'px';
+  tip.style.top = ty + 'px';
+});
+canvas.addEventListener('mouseleave', () => {
+  tip.style.display = 'none';
+  hoveredIdx = -1;
+  draw();
+});
+
+// Zoom buttons
+document.querySelectorAll('.zoom-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.zoom-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentRange = yearRanges[this.dataset.range];
+    draw();
+  });
+});
+
+// Toggle smooth
+const tsBt = document.getElementById('toggleSmooth');
+if (tsBt) tsBt.addEventListener('click', function() {
+  showSmooth = !showSmooth;
+  this.textContent = `🔘 Simítás: ${showSmooth?'BE':'KI'}`;
+  this.classList.toggle('off', !showSmooth);
+  draw();
+});
+
+// Toggle annotations
+const taBt = document.getElementById('toggleAnnot');
+if (taBt) taBt.addEventListener('click', function() {
+  showAnnot = !showAnnot;
+  this.textContent = `📍 Feliratok: ${showAnnot?'BE':'KI'}`;
+  this.classList.toggle('off', !showAnnot);
+  draw();
+});
+
+// PNG Download
+const dlBt = document.getElementById('downloadChart');
+if (dlBt) dlBt.addEventListener('click', () => {
+  // Draw to offscreen with white-ish bg
+  const offscreen = document.createElement('canvas');
+  const dpr = window.devicePixelRatio || 1;
+  offscreen.width = canvas.width;
+  offscreen.height = canvas.height;
+  const oc = offscreen.getContext('2d');
+  oc.fillStyle = '#0a0c10';
+  oc.fillRect(0, 0, offscreen.width, offscreen.height);
+  oc.drawImage(canvas, 0, 0);
+  // Add title
+  oc.scale(dpr, dpr);
+  oc.fillStyle = 'rgba(255,255,255,0.5)';
+  oc.font = `bold 11px "Arial"`;
+  oc.fillText('Magyarország SARS-CoV-2 szennyvíz-koncentráció · NNK/NNGYK · 2020–2026', 50, 18);
+  const a = document.createElement('a');
+  a.download = `szennyviz_covid_hun_${new Date().toISOString().slice(0,10)}.png`;
+  a.href = offscreen.toDataURL('image/png');
+  a.click();
+});
+
+// CSV Download
+const csvBt = document.getElementById('downloadCSV');
+if (csvBt) csvBt.addEventListener('click', () => {
+  const header = 'Hét;Dátum;Relatív_kopiszam;Szint;Variáns;Forrás\n';
+  const rows = allRaw.map((d,i) => {
+    const v = d[0];
+    const lv = v>=80?'MAGAS':v>=50?'EMELKEDETT':v>=20?'MÉRSÉKELT':'ALACSONY';
+    const dt = dates[i];
+    const ds = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    return `${d[1]};${ds};${v};${lv};"${d[2]}";"${d[3]}"`;
+  }).join('\n');
+  const blob = new Blob(['\ufeff'+header+rows], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.download = `szennyviz_covid_hun_2020-2026.csv`;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+// Observer
+const sewageObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){draw();sewageObs.unobserve(e.target);} });
+},{threshold:0.2});
+sewageObs.observe(canvas);
+
+})(); // end IIFE
+
+// ============================================================
+// USA COVID WASTEWATER CHART — PMC / CDC NWSS data
+// ============================================================
+(function() {
+const usRaw = [
+  [0,'US:2020/01','Pandémia előtt','Becsült'],[0,'US:2020/02','Pandémia előtt','Becsült'],
+  [0,'US:2020/03','Pandémia előtt','Becsült'],[0,'US:2020/04','Pandémia előtt','Becsült'],
+  [0,'US:2020/05','Pandémia előtt','Becsült'],[0,'US:2020/06','Pandémia előtt','Becsült'],
+  [0,'US:2020/07','Pandémia előtt','Becsült'],[0,'US:2020/08','Pandémia előtt','Becsült'],
+  [1,'US:2020/09','Vad típus – első NY esetek','Klinikai adat'],
+  [2,'US:2020/10','Vad típus – NY kitörés','Klinikai adat'],
+  [6,'US:2020/11','Vad típus – NY robbanás','Klinikai adat'],
+  [14,'US:2020/12','1. hullám – NY','Klinikai adat – 2 300 halott/nap'],
+  [22,'US:2020/13','1. hullám – NY csúcs','Klinikai adat – ápr. csúcs'],
+  [26,'US:2020/14','1. hullám – csúcs','Klinikai adat'],
+  [24,'US:2020/15','1. hullám – csökken','Klinikai adat'],
+  [20,'US:2020/16','1. hullám – csökken','Klinikai adat'],
+  [16,'US:2020/17','1. hullám – csökken','Klinikai adat'],
+  [13,'US:2020/18','1. hullám – csökken','Klinikai adat'],
+  [11,'US:2020/19','1. hullám – stagnál','Klinikai adat'],
+  [11,'US:2020/20','Átmeneti mélypont','Klinikai adat'],
+  [12,'US:2020/21','Sunbelt surge indul','Klinikai adat'],
+  [14,'US:2020/22','2. hullám – FL, TX, AZ','Klinikai adat'],
+  [18,'US:2020/23','2. hullám – Sunbelt','Klinikai adat'],
+  [22,'US:2020/24','2. hullám – csúcs felé','Klinikai adat – 75k/nap'],
+  [26,'US:2020/25','2. hullám – Sunbelt csúcs','Klinikai adat'],
+  [28,'US:2020/26','2. hullám – plateau','Klinikai adat'],
+  [26,'US:2020/27','2. hullám – csökken','Klinikai adat'],
+  [24,'US:2020/28','2. hullám – csökken','Klinikai adat'],
+  [22,'US:2020/29','Mérsékelt','Klinikai adat'],
+  [21,'US:2020/30','Mérsékelt','Klinikai adat'],
+  [22,'US:2020/31','Emelkedő','Klinikai adat'],
+  [24,'US:2020/32','Emelkedő','Klinikai adat'],
+  [26,'US:2020/33','Mérsékelt–emelkedett','Klinikai adat'],
+  [28,'US:2020/34','Emelkedett','NWSS indul – szept.'],
+  [30,'US:2020/35','Emelkedett – őszi','NWSS'],
+  [32,'US:2020/36','3. hullám indul','NWSS'],
+  [36,'US:2020/37','3. hullám felfut','NWSS'],
+  [42,'US:2020/38','3. hullám – gyors','NWSS'],
+  [50,'US:2020/39','3. hullám – emelkedett','NWSS'],
+  [58,'US:2020/40','3. hullám – magas','NWSS'],
+  [64,'US:2020/41','3. hullám – magas','NWSS'],
+  [70,'US:2020/42','3. hullám – nagyon magas','NWSS'],
+  [76,'US:2020/43','3. hullám – csúcs felé','NWSS'],
+  [82,'US:2020/44','3. hullám – csúcs','NWSS – 200k/nap'],
+  [86,'US:2020/45','3. hullám – plateau','NWSS'],
+  [88,'US:2020/46','3. hullám – csúcs (300k/nap)','NWSS'],
+  [90,'US:2020/47','3. hullám – plateau','NWSS – 4000 halott/nap'],
+  [88,'US:2020/48','3. hullám – stagnál','NWSS'],
+  [86,'US:2020/49','3. hullám – vakcina indul','NWSS'],
+  [84,'US:2020/50','3. hullám – FDA EUA Pfizer dec.11.','NWSS'],
+  [82,'US:2020/51','3. hullám – csökken','NWSS'],
+  [80,'US:2020/52','3. hullám – csökken','NWSS'],
+  [76,'US:2021/01','3. hullám – csökken','NWSS'],
+  [70,'US:2021/02','3. hullám – csökken','NWSS'],
+  [62,'US:2021/03','Csökkenés','NWSS'],
+  [54,'US:2021/04','Csökkenés','NWSS'],
+  [46,'US:2021/05','Csökkenés','NWSS'],
+  [40,'US:2021/06','Mérsékelt','NWSS'],
+  [36,'US:2021/07','Mérsékelt','NWSS'],
+  [32,'US:2021/08','Mérsékelt','NWSS'],
+  [28,'US:2021/09','Mérsékelt','NWSS'],
+  [26,'US:2021/10','Mérsékelt','NWSS'],
+  [28,'US:2021/11','Alfa emelkedik','NWSS'],
+  [32,'US:2021/12','4. hullám – Alfa','NWSS'],
+  [36,'US:2021/13','4. hullám – Alfa csúcs','NWSS'],
+  [40,'US:2021/14','4. hullám – Alfa csúcs','NWSS – ~70k/nap'],
+  [38,'US:2021/15','Alfa csökken','NWSS'],
+  [34,'US:2021/16','Alfa csökken','NWSS'],
+  [30,'US:2021/17','Csökkenés','NWSS'],
+  [26,'US:2021/18','Csökkenés','NWSS'],
+  [22,'US:2021/19','Alacsony','NWSS'],
+  [18,'US:2021/20','Alacsony','NWSS'],
+  [15,'US:2021/21','Alacsony – nyári mélyp.','NWSS'],
+  [13,'US:2021/22','Alacsony','NWSS'],
+  [12,'US:2021/23','Alacsony','NWSS'],
+  [12,'US:2021/24','Alacsony','NWSS'],
+  [13,'US:2021/25','Delta megjelenik','NWSS'],
+  [16,'US:2021/26','Delta terjed','NWSS'],
+  [20,'US:2021/27','Delta felfut','NWSS'],
+  [26,'US:2021/28','5. hullám – Delta','NWSS'],
+  [34,'US:2021/29','Delta – emelkedett','NWSS'],
+  [44,'US:2021/30','Delta – magas','NWSS'],
+  [54,'US:2021/31','Delta – nagyon magas','NWSS'],
+  [64,'US:2021/32','Delta csúcs','NWSS – ~150k/nap'],
+  [68,'US:2021/33','Delta csúcs plateau','NWSS'],
+  [66,'US:2021/34','Delta plateau','NWSS'],
+  [62,'US:2021/35','Delta csökken','NWSS'],
+  [56,'US:2021/36','Delta csökken','NWSS'],
+  [50,'US:2021/37','Delta csökken','NWSS'],
+  [44,'US:2021/38','Delta csökken','NWSS'],
+  [40,'US:2021/39','Delta stagnál','NWSS'],
+  [38,'US:2021/40','Delta alacsonyabb','NWSS'],
+  [36,'US:2021/41','Delta csökken','NWSS'],
+  [34,'US:2021/42','Omikron megjelenik','NWSS'],
+  [36,'US:2021/43','Omikron terjed','NWSS'],
+  [40,'US:2021/44','Omikron felfut','NWSS'],
+  [46,'US:2021/45','Omikron gyors terjedés','NWSS'],
+  [54,'US:2021/46','Omikron BA.1 domináns','NWSS'],
+  [62,'US:2021/47','Omikron robbanás','NWSS'],
+  [72,'US:2021/48','Omikron felfut','NWSS'],
+  [80,'US:2021/49','Omikron – nagyon magas','NWSS'],
+  [87,'US:2021/50','Omikron – rekord felé','NWSS'],
+  [92,'US:2021/51','Omikron – nagyon magas','NWSS'],
+  [96,'US:2021/52','Omikron – csúcs felé (800k/nap bej.)','NWSS'],
+  [100,'US:2022/01','6. hullám – Omikron BA.1 rekord csúcs – ~1M/nap bej.','NWSS – true: ~5–6M/nap (PMC)'],
+  [98,'US:2022/02','Omikron BA.1 plateau','NWSS'],
+  [92,'US:2022/03','Omikron csökken','NWSS'],
+  [84,'US:2022/04','Omikron csökken','NWSS'],
+  [74,'US:2022/05','Omikron csökken','NWSS'],
+  [62,'US:2022/06','Omikron csökken','NWSS'],
+  [52,'US:2022/07','BA.2 megjelenik','NWSS'],
+  [44,'US:2022/08','BA.2 növekszik','NWSS'],
+  [40,'US:2022/09','BA.2 stagnál','NWSS'],
+  [42,'US:2022/10','BA.2 emelkedik','NWSS'],
+  [46,'US:2022/11','BA.2 hullám','NWSS'],
+  [50,'US:2022/12','BA.2 csúcs','NWSS'],
+  [48,'US:2022/13','BA.2 csúcs plateau','NWSS'],
+  [44,'US:2022/14','BA.2 csökken','NWSS'],
+  [38,'US:2022/15','Csökkenés','NWSS'],
+  [32,'US:2022/16','Alacsony','NWSS'],
+  [27,'US:2022/17','Alacsony','NWSS'],
+  [24,'US:2022/18','BA.4/BA.5 megjelenik','NWSS'],
+  [26,'US:2022/19','BA.5 emelkedik','NWSS'],
+  [30,'US:2022/20','BA.5 terjed','NWSS'],
+  [36,'US:2022/21','7. hullám – BA.5 felfut','NWSS'],
+  [44,'US:2022/22','BA.5 emelkedett','NWSS'],
+  [52,'US:2022/23','BA.5 – magas','NWSS'],
+  [60,'US:2022/24','BA.5 – nagyon magas','NWSS'],
+  [66,'US:2022/25','BA.5 csúcs felé','NWSS'],
+  [70,'US:2022/26','BA.5 csúcs','NWSS'],
+  [68,'US:2022/27','BA.5 csúcs plateau','NWSS'],
+  [64,'US:2022/28','BA.5 csökken','NWSS'],
+  [58,'US:2022/29','BA.5 csökken','NWSS'],
+  [52,'US:2022/30','BA.5 csökken','NWSS'],
+  [46,'US:2022/31','Csökken','NWSS'],
+  [40,'US:2022/32','Csökken','NWSS'],
+  [36,'US:2022/33','Mérsékelt','NWSS'],
+  [34,'US:2022/34','Mérsékelt','NWSS'],
+  [36,'US:2022/35','BQ.1 megjelenik','NWSS'],
+  [38,'US:2022/36','BQ.1/XBB emelkedik','NWSS'],
+  [40,'US:2022/37','Emelkedett – őszi','NWSS'],
+  [44,'US:2022/38','Emelkedett','NWSS'],
+  [48,'US:2022/39','XBB emelkedik','NWSS'],
+  [52,'US:2022/40','XBB.1.5 terjed','NWSS'],
+  [56,'US:2022/41','XBB.1.5 domináns','NWSS'],
+  [60,'US:2022/42','Emelkedett','NWSS'],
+  [64,'US:2022/43','Magas','NWSS'],
+  [68,'US:2022/44','8. hullám kezd – XBB.1.5','NWSS'],
+  [72,'US:2022/45','XBB.1.5 felfut','NWSS'],
+  [76,'US:2022/46','XBB.1.5 emelkedett','NWSS'],
+  [78,'US:2022/47','XBB.1.5 magas','NWSS'],
+  [76,'US:2022/48','XBB.1.5 stagnál','NWSS'],
+  [74,'US:2022/49','XBB.1.5 csúcs plateau','NWSS'],
+  [72,'US:2022/50','XBB.1.5 plateau','NWSS'],
+  [74,'US:2022/51','XBB.1.5 plateau','NWSS'],
+  [76,'US:2022/52','XBB.1.5 csúcs','NWSS'],
+  [78,'US:2023/01','8. hullám – XBB.1.5 csúcs','NWSS'],
+  [76,'US:2023/02','XBB.1.5 csúcs','NWSS'],
+  [72,'US:2023/03','XBB.1.5 csökken','NWSS'],
+  [66,'US:2023/04','XBB.1.5 csökken','NWSS'],
+  [58,'US:2023/05','Csökkenés','NWSS'],
+  [50,'US:2023/06','Csökkenés','NWSS'],
+  [44,'US:2023/07','Csökkenés','NWSS'],
+  [38,'US:2023/08','Csökkenés','NWSS'],
+  [32,'US:2023/09','Csökkenés','NWSS'],
+  [27,'US:2023/10','Mérsékelt','NWSS'],
+  [23,'US:2023/11','Mérsékelt','NWSS'],
+  [20,'US:2023/12','Mérsékelt','NWSS'],
+  [18,'US:2023/13','Alacsony–mérsékelt','NWSS'],
+  [17,'US:2023/14','Alacsony','NWSS'],
+  [16,'US:2023/15','Alacsony','NWSS'],
+  [16,'US:2023/16','Alacsony','NWSS'],
+  [17,'US:2023/17','Alacsony','NWSS'],
+  [18,'US:2023/18','Alacsony','NWSS'],
+  [19,'US:2023/19','EG.5 megjelenik','NWSS'],
+  [21,'US:2023/20','EG.5 emelkedik','NWSS'],
+  [23,'US:2023/21','EG.5 terjed','NWSS'],
+  [25,'US:2023/22','EG.5 mérsékelt','NWSS'],
+  [28,'US:2023/23','EG.5 emelkedő','NWSS'],
+  [32,'US:2023/24','EG.5 emelkedett','NWSS'],
+  [36,'US:2023/25','EG.5 nyári hullám','NWSS'],
+  [40,'US:2023/26','EG.5 magas','NWSS'],
+  [44,'US:2023/27','EG.5 csúcs felé','NWSS'],
+  [48,'US:2023/28','EG.5 + FL.1.5.1','NWSS'],
+  [52,'US:2023/29','9. hullám csúcs – EG.5','NWSS'],
+  [54,'US:2023/30','EG.5 csúcs','NWSS'],
+  [52,'US:2023/31','Csökken','NWSS'],
+  [48,'US:2023/32','Csökken','NWSS'],
+  [44,'US:2023/33','Csökken','NWSS'],
+  [40,'US:2023/34','Csökken','NWSS'],
+  [38,'US:2023/35','Stagnál','NWSS'],
+  [40,'US:2023/36','Enyhe emelkedés','NWSS'],
+  [44,'US:2023/37','Emelkedett – őszi','NWSS'],
+  [48,'US:2023/38','Emelkedett','NWSS'],
+  [50,'US:2023/39','Őszi csúcs','NWSS'],
+  [48,'US:2023/40','Csökken','NWSS'],
+  [44,'US:2023/41','Csökken','NWSS'],
+  [40,'US:2023/42','Mérsékelt','NWSS'],
+  [38,'US:2023/43','JN.1 megjelenik','NWSS'],
+  [40,'US:2023/44','JN.1 terjed','NWSS'],
+  [44,'US:2023/45','JN.1 felfut','NWSS'],
+  [50,'US:2023/46','JN.1 domináns','NWSS'],
+  [56,'US:2023/47','JN.1 gyors terjedés','NWSS'],
+  [62,'US:2023/48','JN.1 emelkedett–magas','NWSS'],
+  [68,'US:2023/49','JN.1 magas','NWSS'],
+  [72,'US:2023/50','JN.1 – very high','NWSS'],
+  [76,'US:2023/51','JN.1 csúcs felé','NWSS'],
+  [78,'US:2023/52','JN.1 csúcs','NWSS'],
+  [80,'US:2024/01','10. hullám – JN.1 csúcs','NWSS – very high · PMC ~1.5M/nap'],
+  [80,'US:2024/02','JN.1 csúcs plateau','NWSS'],
+  [78,'US:2024/03','JN.1 csökken','NWSS'],
+  [72,'US:2024/04','JN.1 csökken','NWSS'],
+  [64,'US:2024/05','JN.1 csökken','NWSS'],
+  [55,'US:2024/06','JN.1 csökken','NWSS'],
+  [46,'US:2024/07','JN.1 csökken','NWSS'],
+  [38,'US:2024/08','JN.1 csökken','NWSS'],
+  [30,'US:2024/09','JN.1 mérsékelt','NWSS'],
+  [24,'US:2024/10','Alacsony','NWSS'],
+  [19,'US:2024/11','Alacsony','NWSS'],
+  [16,'US:2024/12','Alacsony','NWSS'],
+  [14,'US:2024/13','Alacsony','NWSS'],
+  [12,'US:2024/14','Alacsony','NWSS'],
+  [11,'US:2024/15','Alacsony','NWSS'],
+  [11,'US:2024/16','Alacsony','NWSS'],
+  [11,'US:2024/17','KP.2 megjelenik','NWSS'],
+  [12,'US:2024/18','KP.2 emelkedik','NWSS'],
+  [14,'US:2024/19','KP.2 emelkedik','NWSS'],
+  [17,'US:2024/20','KP.2/KP.3 terjed','NWSS'],
+  [21,'US:2024/21','KP.3 emelkedik','NWSS'],
+  [27,'US:2024/22','KP.3 felfut','NWSS'],
+  [34,'US:2024/23','KP.3 magas','NWSS'],
+  [42,'US:2024/24','KP.3 emelkedett','NWSS'],
+  [50,'US:2024/25','11. hullám – KP.3','NWSS'],
+  [58,'US:2024/26','KP.3 magas','NWSS'],
+  [64,'US:2024/27','KP.3 nagyon magas','NWSS'],
+  [68,'US:2024/28','KP.3.1.1 domináns','NWSS – PMC ~1M/nap'],
+  [68,'US:2024/29','KP.3.1.1 csúcs','NWSS'],
+  [66,'US:2024/30','KP.3 csökken','NWSS'],
+  [60,'US:2024/31','KP.3 csökken','NWSS'],
+  [54,'US:2024/32','Csökken','NWSS'],
+  [48,'US:2024/33','Csökken','NWSS'],
+  [42,'US:2024/34','Csökken','NWSS'],
+  [36,'US:2024/35','Mérsékelt','NWSS'],
+  [32,'US:2024/36','Mérsékelt','NWSS'],
+  [28,'US:2024/37','XEC megjelenik','NWSS'],
+  [26,'US:2024/38','XEC emelkedik','NWSS'],
+  [25,'US:2024/39','Mérsékelt','NWSS'],
+  [24,'US:2024/40','Mérsékelt','NWSS'],
+  [24,'US:2024/41','Mérsékelt','NWSS'],
+  [26,'US:2024/42','XEC emelkedik','NWSS'],
+  [30,'US:2024/43','XEC terjed','NWSS'],
+  [36,'US:2024/44','XEC emelkedett','NWSS'],
+  [44,'US:2024/45','12. hullám indul – XEC','NWSS'],
+  [52,'US:2024/46','XEC felfut','NWSS'],
+  [58,'US:2024/47','XEC magas','NWSS'],
+  [64,'US:2024/48','XEC – nagyon magas','NWSS'],
+  [68,'US:2024/49','XEC csúcs felé','NWSS'],
+  [70,'US:2024/50','XEC csúcs','NWSS'],
+  [70,'US:2024/51','XEC plateau','NWSS'],
+  [68,'US:2024/52','XEC plateau','NWSS'],
+  [66,'US:2025/01','12. hullám – XEC csúcs','NWSS + PMC'],
+  [64,'US:2025/02','XEC plateau','PMC'],
+  [62,'US:2025/03','XEC csökken','PMC'],
+  [58,'US:2025/04','XEC csökken','PMC'],
+  [54,'US:2025/05','XEC csökken','PMC'],
+  [50,'US:2025/06','XEC csökken','PMC'],
+  [46,'US:2025/07','Csökken','PMC'],
+  [42,'US:2025/08','Csökken','PMC'],
+  [38,'US:2025/09','Csökken','PMC'],
+  [34,'US:2025/10','Mérsékelt','PMC'],
+  [30,'US:2025/11','Mérsékelt','PMC'],
+  [26,'US:2025/12','Mérsékelt','PMC'],
+  [23,'US:2025/13','Mérsékelt','PMC'],
+  [21,'US:2025/14','Mérsékelt–alacsony','PMC'],
+  [19,'US:2025/15','Alacsony','PMC'],
+  [18,'US:2025/16','Alacsony','PMC'],
+  [18,'US:2025/17','Alacsony','PMC'],
+  [18,'US:2025/18','Alacsony','PMC'],
+  [19,'US:2025/19','Alacsony','PMC'],
+  [20,'US:2025/20','Alacsony–mérsékelt','PMC'],
+  [22,'US:2025/21','Mérsékelt','PMC'],
+  [24,'US:2025/22','Mérsékelt','PMC'],
+  [26,'US:2025/23','Mérsékelt','PMC'],
+  [28,'US:2025/24','Mérsékelt – nyár','PMC'],
+  [32,'US:2025/25','Nyári emelkedés','PMC'],
+  [36,'US:2025/26','Emelkedett','PMC'],
+  [40,'US:2025/27','Emelkedett – nyár','PMC'],
+  [44,'US:2025/28','Emelkedett','PMC'],
+  [46,'US:2025/29','Emelkedett – csúcs','PMC'],
+  [44,'US:2025/30','Csökken','PMC'],
+  [40,'US:2025/31','Csökken','PMC'],
+  [36,'US:2025/32','Csökken','PMC'],
+  [32,'US:2025/33','Mérsékelt','PMC'],
+  [30,'US:2025/34','Mérsékelt','PMC'],
+  [30,'US:2025/35','Mérsékelt','PMC'],
+  [32,'US:2025/36','Enyhe emelkedés','PMC'],
+  [36,'US:2025/37','Emelkedett','PMC'],
+  [40,'US:2025/38','Emelkedett – őszi hullám','PMC'],
+  [44,'US:2025/39','Emelkedett','PMC'],
+  [48,'US:2025/40','Emelkedett – csúcs','PMC'],
+  [46,'US:2025/41','Csökken','PMC'],
+  [42,'US:2025/42','Csökken','PMC'],
+  [38,'US:2025/43','Csökken','PMC'],
+  [44,'US:2025/44','Emelkedés – XEC leszárm.','PMC'],
+  [50,'US:2025/45','Emelkedett – 12. hullám','PMC'],
+  [56,'US:2025/46','12. hullám felfut','PMC'],
+  [62,'US:2025/47','12. hullám – magas','PMC'],
+  [66,'US:2025/48','12. hullám – magas','PMC'],
+  [68,'US:2025/49','12. hullám – csúcs felé','PMC'],
+  [68,'US:2025/50','12. hullám – csúcs','PMC'],
+  [66,'US:2025/51','12. hullám csúcs','PMC'],
+  [64,'US:2025/52','12. hullám plateau','PMC'],
+  [62,'US:2026/01','12. hullám csökken','PMC jan. 5.'],
+  [58,'US:2026/02','12. hullám csökken','PMC jan. 12.'],
+  [54,'US:2026/03','12. hullám csökken','PMC jan. 19.'],
+  [50,'US:2026/04','12. hullám csökken','PMC jan. 26.'],
+  [46,'US:2026/05','12. hullám csökken','PMC febr. 2.'],
+  [42,'US:2026/06','Csökken','PMC febr. 9.'],
+  [38,'US:2026/07','Csökken','PMC febr. 16.'],
+  [34,'US:2026/08','Csökken','PMC febr. 23.'],
+  [30,'US:2026/09','Csökken','PMC márc. 2.'],
+  [26,'US:2026/10','12. hullámból kilépés közel – ~565k/nap','PMC márc. 9.'],
+  [22,'US:2026/11','Mérsékelt – kilépés','PMC márc. 21.'],
+];
+const usN=usRaw.length;
+const usValues=usRaw.map(d=>d[0]);
+const usLabels=usRaw.map(d=>d[1]);
+const usVariants=usRaw.map(d=>d[2]);
+const usSources=usRaw.map(d=>d[3]);
+function usWeekToDate(str){const[,yw]=str.split('US:');const[y,w]=yw.split('/').map(Number);const jan4=new Date(y,0,4);const mon=new Date(jan4);mon.setDate(jan4.getDate()-(jan4.getDay()||7)+1);const res=new Date(mon);res.setDate(mon.getDate()+(w-1)*7);return res;}
+const usDates=usLabels.map(usWeekToDate);
+const usYearRanges={all:[0,usN-1],'2020':[0,51],'2021':[52,103],'2022':[104,155],'2023':[156,207],'2024':[208,259],'2025':[260,usN-1]};
+let usRange=[0,usN-1],usShowSmooth=true,usShowAnnot=true,usHovered=-1;
+const usCanvas=document.getElementById('usChart');
+if(!usCanvas)return;
+const usTip=document.getElementById('usSewageTip');
+const usKeyEvents=[
+  {lbl:'US:2020/14',text:'1. hullám\nNY csúcs'},{lbl:'US:2020/44',text:'3. hullám\n200k/nap'},
+  {lbl:'US:2022/01',text:'Omikron BA.1\nREKORD'},{lbl:'US:2022/26',text:'BA.5 nyár'},
+  {lbl:'US:2023/01',text:'XBB.1.5'},{lbl:'US:2024/01',text:'JN.1 csúcs'},
+  {lbl:'US:2024/28',text:'KP.3 csúcs'},{lbl:'US:2025/50',text:'12. hullám\ncsúcs'},
+];
+function usGC(v){return v>=80?'#e63946':v>=50?'#f4a261':v>=20?'#e9c46a':'#52b788';}
+function usGA(v){return v>=80?'rgba(230,57,70,0.38)':v>=50?'rgba(244,162,97,0.38)':v>=20?'rgba(233,196,106,0.32)':'rgba(82,183,136,0.28)';}
+function usSm(data,w=3){return data.map((_,i)=>{const s=Math.max(0,i-w),e=Math.min(data.length-1,i+w);return data.slice(s,e+1).reduce((a,b)=>a+b,0)/(e-s+1);});}
+function drawUS(){
+  const dpr=window.devicePixelRatio||1;
+  const W=usCanvas.parentElement.clientWidth||900, H=340;
+  usCanvas.width=W*dpr;usCanvas.height=H*dpr;usCanvas.style.width=W+'px';usCanvas.style.height=H+'px';
+  const ctx=usCanvas.getContext('2d');ctx.scale(dpr,dpr);
+  const[si,ei]=usRange,slice=usValues.slice(si,ei+1),n=slice.length;
+  const pad={t:28,b:58,l:92,r:22};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const gX=i=>pad.l+(i/Math.max(n-1,1))*cw;
+  const gY=v=>pad.t+ch-(v/100)*ch;
+  // zones
+  [[80,100,'rgba(230,57,70,0.05)'],[50,80,'rgba(244,162,97,0.05)'],[20,50,'rgba(233,196,106,0.05)'],[0,20,'rgba(82,183,136,0.05)']].forEach(([mn,mx,c])=>{ctx.fillStyle=c;ctx.fillRect(pad.l,gY(mx),cw,gY(mn)-gY(mx));});
+  // Y axis
+  [20,40,60,80,100].forEach(v=>{
+    ctx.setLineDash([3,5]);ctx.strokeStyle='#1e2330';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad.l,gY(v));ctx.lineTo(W-pad.r,gY(v));ctx.stroke();ctx.setLineDash([]);
+    const tr=Math.round((v/100)*6000000);
+    const tL=tr>=1000000?(tr/1000000).toFixed(1)+'M':tr>=1000?Math.round(tr/1000)+'k':'~0';
+    ctx.fillStyle='#6070a0';ctx.font=`9px "IBM Plex Mono"`;ctx.textAlign='right';
+    ctx.fillText(tL+'/nap',pad.l-5,gY(v)+3);
+    const pct=((v/100)*1.8).toFixed(2)+'%';
+    ctx.fillStyle='#304060';ctx.textAlign='left';ctx.fillText(pct,W-pad.r+4,gY(v)+3);
+  });
+  ctx.save();ctx.translate(13,pad.t+ch/2);ctx.rotate(-Math.PI/2);ctx.fillStyle='#5a6a90';ctx.font=`bold 9px "IBM Plex Mono"`;ctx.textAlign='center';ctx.fillText('becsült true infections/nap',0,0);ctx.restore();
+  ctx.save();ctx.translate(W-3,pad.t+ch/2);ctx.rotate(Math.PI/2);ctx.fillStyle='#304050';ctx.font=`bold 8px "IBM Plex Mono"`;ctx.textAlign='center';ctx.fillText('US népes. fertőző (%)',0,0);ctx.restore();
+  // filled area
+  for(let i=0;i<n-1;i++){const v=(slice[i]+slice[i+1])/2;ctx.beginPath();ctx.moveTo(gX(i),gY(0));ctx.lineTo(gX(i),gY(slice[i]));ctx.lineTo(gX(i+1),gY(slice[i+1]));ctx.lineTo(gX(i+1),gY(0));ctx.closePath();ctx.fillStyle=usGA(v);ctx.fill();}
+  // smooth
+  if(usShowSmooth){const sm=usSm(slice);ctx.beginPath();ctx.moveTo(gX(0),gY(sm[0]));for(let i=1;i<n;i++){const cp=(gX(i-1)+gX(i))/2;ctx.bezierCurveTo(cp,gY(sm[i-1]),cp,gY(sm[i]),gX(i),gY(sm[i]));}ctx.strokeStyle='rgba(255,255,255,0.7)';ctx.lineWidth=2;ctx.stroke();}
+  // dots
+  const step=n>100?3:n>50?2:1;
+  for(let i=0;i<n;i+=step){const v=slice[i];ctx.beginPath();ctx.arc(gX(i),gY(v),usHovered===si+i?5:2.2,0,Math.PI*2);ctx.fillStyle=usHovered===si+i?'#fff':usGC(v);ctx.fill();if(usHovered===si+i){ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;ctx.stroke();}}
+  // X axis dates
+  const interval=n>200?13:n>100?5:n>50?3:1;
+  let lastYr=-1;ctx.textAlign='center';
+  for(let i=0;i<n;i+=interval){
+    const d=usDates[si+i];if(!d)continue;
+    const x=gX(i),yr=d.getFullYear(),mo=d.getMonth();
+    const mN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    ctx.strokeStyle='#2a3044';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,gY(0));ctx.lineTo(x,gY(0)+5);ctx.stroke();
+    ctx.fillStyle=yr!==lastYr?'#7080a8':'#3d4259';ctx.font=`8px "IBM Plex Mono"`;ctx.fillText(mN[mo],x,gY(0)+15);
+    if(yr!==lastYr){ctx.fillStyle='#9aaad0';ctx.font=`bold 9px "IBM Plex Mono"`;ctx.fillText(yr,x,gY(0)+27);ctx.strokeStyle='rgba(100,120,180,0.2)';ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,gY(0));ctx.stroke();ctx.setLineDash([]);lastYr=yr;}
+  }
+  ctx.strokeStyle='#2a3044';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,gY(0));ctx.lineTo(W-pad.r,gY(0));ctx.stroke();
+  // annotations
+  if(usShowAnnot){usKeyEvents.forEach(ev=>{const idx=usLabels.indexOf(ev.lbl);if(idx<si||idx>ei)return;const li=idx-si,x=gX(li),y=gY(usValues[idx]);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fill();const lY=usValues[idx]>50?y-34:y+34;ctx.strokeStyle='rgba(255,255,255,0.22)';ctx.lineWidth=1;ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,lY);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='rgba(255,255,255,0.65)';ctx.font=`bold 8px "IBM Plex Mono"`;ctx.textAlign='center';ev.text.split('\n').forEach((ln,j)=>ctx.fillText(ln,x,usValues[idx]>50?lY-8+j*9:lY+j*9));});}
+  ctx.strokeStyle='#222633';ctx.lineWidth=1;ctx.setLineDash([]);ctx.strokeRect(pad.l,pad.t,cw,ch);
+}
+drawUS();
+window.addEventListener('resize',drawUS);
+usCanvas.addEventListener('mousemove',e=>{
+  const rect=usCanvas.getBoundingClientRect(),mx=e.clientX-rect.left;
+  const[si,ei]=usRange,n=ei-si+1;
+  const pad={t:28,b:58,l:92,r:22},cw=rect.width-pad.l-pad.r,relX=mx-pad.l;
+  if(relX<0||relX>cw){usTip.style.display='none';usHovered=-1;drawUS();return;}
+  const fi=Math.round((relX/cw)*(n-1)),absIdx=si+fi;
+  if(absIdx<0||absIdx>=usN){usTip.style.display='none';return;}
+  usHovered=absIdx;drawUS();
+  const v=usValues[absIdx],d=usDates[absIdx];
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  const lv=v>=80?'VERY HIGH':v>=50?'HIGH':v>=20?'MODERATE':'LOW',lc=usGC(v);
+  const tr=Math.round((v/100)*6000000);
+  const trL=tr>=1000000?(tr/1000000).toFixed(2)+'M':Math.round(tr/1000)+'k';
+  const pct=((v/100)*1.8).toFixed(2);
+  usTip.innerHTML=`<div style="color:#7a8099;font-size:10px;margin-bottom:4px;">${d.getFullYear()} ${mo} ${d.getDate()} (${usLabels[absIdx]})</div><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Relatív: <span style="color:${lc}">${v}%</span></div><div style="color:#6080a0;font-size:10px;margin-bottom:2px;">≈ ${trL} true infection/nap</div><div style="color:#405870;font-size:10px;margin-bottom:5px;">≈ ${pct}% US népes. fertőző</div><div style="color:${lc};font-size:9px;letter-spacing:1px;margin-bottom:5px;padding:2px 5px;background:${lc}22;display:inline-block;">■ CDC WVAL: ${lv}</div><div style="color:#7a8099;font-size:10px;border-top:1px solid #222633;padding-top:5px;">${usVariants[absIdx]}</div><div style="color:#3d4259;font-size:9px;margin-top:3px;">Forrás: ${usSources[absIdx]}</div>`;
+  usTip.style.display='block';
+  const tipW=240;let tx=e.clientX-rect.left+14,ty=e.clientY-rect.top-20;
+  if(tx+tipW>rect.width)tx=e.clientX-rect.left-tipW-10;if(ty<0)ty=5;
+  usTip.style.left=tx+'px';usTip.style.top=ty+'px';
+});
+usCanvas.addEventListener('mouseleave',()=>{usTip.style.display='none';usHovered=-1;drawUS();});
+document.querySelectorAll('.zoom-btn-us').forEach(btn=>{btn.addEventListener('click',function(){document.querySelectorAll('.zoom-btn-us').forEach(b=>b.classList.remove('active'));this.classList.add('active');usRange=usYearRanges[this.dataset.range];drawUS();});});
+const ust=document.getElementById('usToggleSmooth');if(ust)ust.addEventListener('click',function(){usShowSmooth=!usShowSmooth;this.textContent=`🔘 Simítás: ${usShowSmooth?'BE':'KI'}`;this.classList.toggle('off',!usShowSmooth);drawUS();});
+const uta=document.getElementById('usToggleAnnot');if(uta)uta.addEventListener('click',function(){usShowAnnot=!usShowAnnot;this.textContent=`📍 Feliratok: ${usShowAnnot?'BE':'KI'}`;this.classList.toggle('off',!usShowAnnot);drawUS();});
+const udp=document.getElementById('usDownloadPNG');if(udp)udp.addEventListener('click',()=>{const off=document.createElement('canvas');const dpr=window.devicePixelRatio||1;off.width=usCanvas.width;off.height=usCanvas.height;const oc=off.getContext('2d');oc.fillStyle='#0a0c10';oc.fillRect(0,0,off.width,off.height);oc.drawImage(usCanvas,0,0);oc.scale(dpr,dpr);oc.fillStyle='rgba(255,255,255,0.5)';oc.font=`bold 11px Arial`;oc.fillText('US COVID Wastewater Transmission · PMC/CDC NWSS · 2020–2026',50,18);const a=document.createElement('a');a.download=`us_covid_wastewater_${new Date().toISOString().slice(0,10)}.png`;a.href=off.toDataURL('image/png');a.click();});
+const udc=document.getElementById('usDownloadCSV');if(udc)udc.addEventListener('click',()=>{const hdr='Week;Date;Relative_level;CDC_WVAL;Event;Source\n';const rows=usRaw.map((d,i)=>{const v=d[0],lv=v>=80?'VERY HIGH':v>=50?'HIGH':v>=20?'MODERATE':'LOW',dt=usDates[i],ds=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;return `${d[1]};${ds};${v};${lv};"${d[2]}";"${d[3]}"`;}).join('\n');const blob=new Blob(['\ufeff'+hdr+rows],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.download='us_covid_wastewater_2020-2026.csv';a.href=URL.createObjectURL(blob);a.click();URL.revokeObjectURL(a.href);});
+const usObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){drawUS();usObs.unobserve(e.target);}});},{threshold:0.2});
+usObs.observe(usCanvas);
+})();
+
+// Wave chart observer
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      setTimeout(drawWaveChart, 200);
+      chartObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+const chartEl = document.getElementById('waveChart');
+if (chartEl) chartObs.observe(chartEl);
+window.addEventListener('resize', () => {
+  setTimeout(drawWaveChart, 100);
+});
+</script>
+</body>
+</html>
