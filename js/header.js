@@ -82,9 +82,6 @@ const UI = {
         <a href="${b}modules/process/factory_onboarding_plan.html" class="dropdown-item">
           <i class="fas fa-file-invoice"></i> Gyár Kézikönyv
         </a>
-        <a href="${b}modules/process/factory_3d_tour.html" class="dropdown-item">
-          <i class="fas fa-vr-cardboard"></i> 3D Tour
-        </a>
         <a href="${b}modules/termeles_tervezo_sap.html" class="dropdown-item">
           <i class="fas fa-clipboard-list"></i> Termelés Tervező
         </a>
